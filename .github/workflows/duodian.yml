@@ -2,7 +2,7 @@ name: 多点APP
 
 on:
   schedule:
-    - cron: '0 16 * * *'
+    - cron: '0 0,3,13,23 * * *'
   watch:
     types: [started]
 jobs:
