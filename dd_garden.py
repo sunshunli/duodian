@@ -226,18 +226,19 @@ def get_task_list(cookies, msg):
     except Exception as e:
         print(e)
         return
-    data = response.json()["data"]["gardenTaskResponseList"]
-    for index, task in enumerate(data):
-        # 任务未完成状态才执行任务
-        if task['taskStatus'] == 1:  # 1 任务未执行 2 任务执行完，可以领取奖励 0 任务不可执行
-            if task['taskId'] == 37:
-                finish_browser_task(cookies, task)
+    data = response.json()["data"] and response.json()["data"]["gardenTaskResponseList"]
+    if data:
+        for index, task in enumerate(data):
+            # 任务未完成状态才执行任务
+            if task['taskStatus'] == 1:  # 1 任务未执行 2 任务执行完，可以领取奖励 0 任务不可执行
+                if task['taskId'] == 37:
+                    finish_browser_task(cookies, task)
+                else:
+                    do_task(cookies, task)
+            elif task['taskStatus'] == 2:
+                get_daily_reward(cookies, task)
             else:
-                do_task(cookies, task)
-        elif task['taskStatus'] == 2:
-            get_daily_reward(cookies, task)
-        else:
-            print(f"{task['taskName']}任务已完成")
+                print(f"{task['taskName']}任务已完成")
 
 
 def do_task(cookies, task):
