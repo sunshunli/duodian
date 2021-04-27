@@ -475,8 +475,7 @@ def get_url_query(url):
 
 
 def run():
-    print(f"开始运行多点果园自动执行脚本")
-
+    print(f"开始运行多点果园自动执行脚本", time.strftime('%Y-%m-%d %H:%M:%S'))
     for k, v in enumerate(cookiesList):
         print(f">>>>>>>【账号开始{k+1}】\n")
         cookies = str2dict(v)
