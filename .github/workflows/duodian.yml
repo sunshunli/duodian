@@ -1,8 +1,8 @@
-name: 喜马拉雅极速版
+name: 多点APP
 
 on:
   schedule:
-    - cron: '*/30 * * * * '
+    - cron: '0 23,24,4,14 * * *'
   watch:
     types: [started]
 jobs:
