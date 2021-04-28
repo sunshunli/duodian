@@ -21,7 +21,7 @@ jobs:
         run: pip install -r ./requirements.txt 
         
       - name: 'run 多点果园'
-        run: python3 dd_garden.py
+        run: python3 bin/dd_garden.py
         env:
             DD_GARDEN_COOKIE: ${{ secrets.DD_GARDEN_COOKIE }}  #必须
             BARK: ${{ secrets.BARK }}     # bark服务

@@ -41,7 +41,7 @@ if "TG_BOT_TOKEN" in os.environ and os.environ["TG_BOT_TOKEN"] and "TG_USER_ID" 
 ###################################################
 # 读取配置文件
 curpath = os.path.dirname(os.path.realpath(__file__))
-cfgpath = os.path.join(curpath, 'config', 'config.ini')
+cfgpath = os.path.join(curpath, '../conf', 'config.ini')
 # 创建管理对象
 conf = configparser.ConfigParser()
 # 读ini文件
@@ -317,7 +317,8 @@ def get_task_list(cookies, msg):
             elif task['taskStatus'] == 2:
                 get_daily_reward(cookies, task)
             else:
-                print(f"{task['taskName']}任务已完成")
+                if msg == '获取任务列表':
+                    print(f"{task['taskName']}任务已完成")
 
 
 def do_task(cookies, task):
