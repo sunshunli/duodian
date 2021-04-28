@@ -14,7 +14,7 @@
 pipenv install -r requirements.txt
 """
 
-
+import sys
 import requests
 import json
 import time
@@ -23,6 +23,10 @@ import os
 from datetime import datetime, timedelta
 import threading
 from urllib.parse import urlencode, urlparse
+
+curpath = os.path.dirname(os.path.realpath(__file__))
+package_path = os.path.join(curpath, '../utils')
+sys.path.append(package_path)
 from utils.dd_cookies import get_cookies
 
 
@@ -40,7 +44,6 @@ if "TG_BOT_TOKEN" in os.environ and os.environ["TG_BOT_TOKEN"] and "TG_USER_ID" 
     print("Telegram 推送打开")
 ###################################################
 # 读取配置文件
-curpath = os.path.dirname(os.path.realpath(__file__))
 cfgpath = os.path.join(curpath, '../conf', 'config.ini')
 # 创建管理对象
 conf = configparser.ConfigParser()
