@@ -381,7 +381,7 @@ def get_daily_reward(cookies, task):
             i = i + 1
         get_daily_reward(cookies, task)
     else:
-        print(data)
+        data = json.loads(data)
         if data['data']['haveTimeInterval'] is not None:
             # 需要定时器
             fun_timer(data['timeInterval'], get_daily_reward, [cookies, task])
