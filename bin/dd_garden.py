@@ -25,8 +25,8 @@ import threading
 from urllib.parse import urlencode, urlparse
 
 curpath = os.path.dirname(os.path.realpath(__file__))
-package_path = os.path.join(curpath, '../utils')
-sys.path.append(package_path)
+base_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+sys.path.append(base_path)
 from utils.dd_cookies import get_cookies
 
 
