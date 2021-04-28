@@ -1,4 +1,5 @@
 import requests
+import json
 import time
 import os
 from datetime import datetime, timedelta
@@ -96,6 +97,94 @@ def str2dict(str_cookie):
         print("cookie填写出错 ❌,仔细查看说明")
         raise
     return dict_cookie
+
+
+def fun_timer(sec, fn, args):
+    # print('定时器执行时间:', time.strftime('%Y-%m-%d %H:%M:%S'))
+    global timer
+    timer = threading.Timer(sec, fn, args)
+    timer.start()
+
+
+def get_url_query(url):
+    # 获取url地址中的参数
+    query_array = urlparse(url).query.split('&')
+
+    query_dict = {}
+    for v in query_array:
+        _temp = v.split('=')
+        query_dict[_temp[0]] = _temp[1]
+
+    return query_dict
+
+
+def touch_tree_drop(cookies):
+    # 点击果树，有机会掉落水滴
+    headers = {
+        'Host': 'farm.dmall.com',
+        'Connection': 'keep-alive',
+        'Pragma': 'no-cache',
+        'Cache-Control': 'no-cache',
+        'User-Agent': UserAgent,
+        'Accept': '*/*',
+        'Referer': 'https://act.dmall.com/dac/fruitgarden/index.html?dmfrom=wx&dmTransStatusBar=true&dmShowTitleBar=false&bounces=false&dmNeedLogin=true&dmNeedCloseLoading=false',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language': 'zh-CN,en-US;q=0.8',
+        'X-Requested-With': 'com.wm.dmall'
+    }
+    params = {
+        'platformCode': '1',
+        'vendorId': '1',
+        'storeId': cookies['storeId'],
+        'treeId': '10',
+        'treeLevel': '3',
+        'token': cookies['token'],
+        'ticketName': cookies['ticketName'],
+    }
+    try:
+        response = requests.get('https://farm.dmall.com/gardenTree/dropGood', headers=headers, params=params, cookies=cookies, verify=False)
+    except:
+        print("网络请求异常,touch_tree_drop")
+        return
+    data = response.json()['data']['config']
+    data = json.loads(data)
+    if data.get('awardType', -1) == 1:
+        print(f"点击果树掉落{data['awardNums']}水滴")
+        # 拾取掉落的水滴
+        receive_tree_drop(cookies)
+
+
+def receive_tree_drop(cookies):
+    # 拾取果树掉落的水滴
+    headers = {
+        'Host': 'farm.dmall.com',
+        'Connection': 'keep-alive',
+        'Pragma': 'no-cache',
+        'Cache-Control': 'no-cache',
+        'User-Agent': UserAgent,
+        'Accept': '*/*',
+        'Referer': 'https://act.dmall.com/dac/fruitgarden/index.html?dmfrom=wx&dmTransStatusBar=true&dmShowTitleBar=false&bounces=false&dmNeedLogin=true&dmNeedCloseLoading=false',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language': 'zh-CN,en-US;q=0.8',
+        'X-Requested-With': 'com.wm.dmall'
+    }
+    params = {
+        'vendorId': '1',
+        'storeId': cookies['storeId'],
+        'descRewardId': '25',
+        'token': cookies['token'],
+        'ticketName': cookies['ticketName'],
+    }
+    try:
+        response = requests.get('https://farm.dmall.com/gardenTree/receiveGood', headers=headers, params=params,
+                                cookies=cookies, verify=False)
+    except:
+        print("网络请求异常,touch_tree_drop")
+        return
+    data = response.json()['data']['config']
+    data = json.loads(data)
+    if data.get('awardType', -1) == 1:
+        print(f"拾取果树掉落{data['awardNums']}水滴")
 
 
 def daily_sign(cookies):
@@ -292,6 +381,7 @@ def get_daily_reward(cookies, task):
             i = i + 1
         get_daily_reward(cookies, task)
     else:
+        print(data)
         if data['data']['haveTimeInterval'] is not None:
             # 需要定时器
             fun_timer(data['timeInterval'], get_daily_reward, [cookies, task])
@@ -394,14 +484,14 @@ def finish_browser_page(cookies, task):
     finally_data = {
         'param': _payload
     }
-    print('浏览完毕')
     try:
         response = requests.post('https://appapi.dmall.com/app/farm/dofinishTask', headers=finally_headers, data=urlencode(finally_data), verify=False)
     except:
         print("网络请求异常,finish_browser_page")
         return
-    result = response.json()
-    print('浏览任务1', result)
+    result = response.json()['data']
+    result = json.loads(result)
+    print(f"执行完成{task['taskName']}任务，获得{result['gardenBrowseTaskExtResponse']['browseRewardAmount']}")
 
 
 def finish_browser_task(cookies, task):
@@ -464,30 +554,16 @@ def do_task_type_default(cookies, task):
     print('default')
 
 
-def fun_timer(sec, fn, args):
-    # print('定时器执行时间:', time.strftime('%Y-%m-%d %H:%M:%S'))
-    global timer
-    timer = threading.Timer(sec, fn, args)
-    timer.start()
-
-
-def get_url_query(url):
-    # 获取url地址中的参数
-    query_array = urlparse(url).query.split('&')
-
-    query_dict = {}
-    for v in query_array:
-        _temp = v.split('=')
-        query_dict[_temp[0]] = _temp[1]
-
-    return query_dict
-
-
 def run():
     print(f"开始运行多点果园自动执行脚本", time.strftime('%Y-%m-%d %H:%M:%S'))
     for k, v in enumerate(cookiesList):
         print(f">>>>>>>【账号开始{k+1}】\n")
         cookies = str2dict(v)
+
+        # 点击10次果树，间隔5s，拾取随机掉落的水滴
+        for i in range(10):
+            time.sleep(5)
+            touch_tree_drop(cookies)
 
         # 每日签到任务
         daily_sign(cookies)
