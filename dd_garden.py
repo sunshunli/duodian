@@ -1,64 +1,55 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+多点果园自动脚本
+每日早上7点执行领取水滴奖励任务
+每日8-9点 12-14点 18-21点领每日三餐福袋
+
+生成虚拟环境依赖包requirements.txt,用于项目发布。这样即使新的环境没有安装pipenv也可以直接安装依赖包。
+方法1：pipenv run pip freeze > requirements.txt
+方法2：pipenv lock -r --dev > requirements.txt
+
+虚拟环境中导入requirements.txt
+pipenv install -r requirements.txt
+"""
+
+
 import requests
 import json
 import time
+import configparser
 import os
 from datetime import datetime, timedelta
 import threading
-from urllib.parse import urlencode
-from urllib.parse import urlparse
+from urllib.parse import urlencode, urlparse
+from utils.dd_cookies import get_cookies
 
-
-# 多点果园自动脚本
-###################################################
-# 每日早上7点执行领取水滴奖励任务
-# 每日8-9点 12-14点 18-21点领每日三餐福袋
-
-# 生成虚拟环境依赖包requirements.txt,用于项目发布。这样即使新的环境没有安装pipenv也可以直接安装依赖包。
-# 方法1：pipenv run pip freeze > requirements.txt
-# 方法2：pipenv lock -r --dev > requirements.txt
-
-# 虚拟环境中导入requirements.txt
-# pipenv install -r requirements.txt
-###################################################
-# 对应方案2: 下载到本地,需要此处填写
-cookies1 = ""
-cookies2 = ""
-
-cookiesList = [cookies1, ]   # 多账号准备
-
-# 通知服务
-BARK = ''                   # bark服务,自行搜索; secrets可填;形如jfjqxDx3xxxxxxxxSaK的字符串
-SCKEY = ''                  # Server酱的SCKEY; secrets可填
-TG_BOT_TOKEN = ''           # telegram bot token 自行申请
-TG_USER_ID = ''             # telegram 用户ID
 
 ###################################################
-# 对应方案1:  GitHub action自动运行,此处无需填写;
-if "DD_GARDEN_COOKIE" in os.environ:
-    """
-    判断是否运行自GitHub action,"DD_GARDEN_COOKIE" 该参数与 repo里的Secrets的名称保持一致
-    """
-    print("执行自GitHub action")
-    dd_garden_cookie = os.environ["DD_GARDEN_COOKIE"]
-    cookiesList = []  # 重置cookiesList
-    for line in dd_garden_cookie.split('\n'):
-        if not line:
-            continue
-        cookiesList.append(line)
-    # GitHub action运行需要填写对应的secrets
-    if "BARK" in os.environ and os.environ["BARK"]:
-        BARK = os.environ["BARK"]
-        print("BARK 推送打开")
-    if "SCKEY" in os.environ and os.environ["SCKEY"]:
-        BARK = os.environ["SCKEY"]
-        print("serverJ 推送打开")
-    if "TG_BOT_TOKEN" in os.environ and os.environ["TG_BOT_TOKEN"] and "TG_USER_ID" in os.environ and os.environ["TG_USER_ID"]:
-        TG_BOT_TOKEN = os.environ["TG_BOT_TOKEN"]
-        TG_USER_ID = os.environ["TG_USER_ID"]
-        print("Telegram 推送打开")
+# GitHub action运行需要填写对应的secrets
+if "BARK" in os.environ and os.environ["BARK"]:
+    BARK = os.environ["BARK"]
+    print("BARK 推送打开")
+if "SCKEY" in os.environ and os.environ["SCKEY"]:
+    BARK = os.environ["SCKEY"]
+    print("serverJ 推送打开")
+if "TG_BOT_TOKEN" in os.environ and os.environ["TG_BOT_TOKEN"] and "TG_USER_ID" in os.environ and os.environ["TG_USER_ID"]:
+    TG_BOT_TOKEN = os.environ["TG_BOT_TOKEN"]
+    TG_USER_ID = os.environ["TG_USER_ID"]
+    print("Telegram 推送打开")
 ###################################################
-# 可选项
-UserAgent = "Mozilla/5.0 (Linux; Android 5.1.1; LYA-AL10 Build/LMY47I; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/52.0.2743.100 Mobile Safari/537.36 Dmall/5.0.4"
+# 读取配置文件
+curpath = os.path.dirname(os.path.realpath(__file__))
+cfgpath = os.path.join(curpath, 'config', 'config.ini')
+# 创建管理对象
+conf = configparser.ConfigParser()
+# 读ini文件
+conf.read(cfgpath, encoding="utf-8")
+# 读取配置文件中的User Agent
+UserAgent = conf['user_agent']['garden_ua']
+cookiesList = get_cookies()
+###################################################
 ts = datetime.now() - timedelta(hours=1)
 previous_time_stamp = int(time.mktime(ts.timetuple()) * 1000)
 
@@ -112,7 +103,7 @@ def get_url_query(url):
 
     query_dict = {}
     for v in query_array:
-        _temp = v.split('=')
+        _temp = str(v).split('=')
         query_dict[_temp[0]] = _temp[1]
 
     return query_dict
@@ -582,8 +573,6 @@ def run():
 
 if __name__ == "__main__":
     run()
-
-
 
 
 
