@@ -407,6 +407,7 @@ def get_daily_reward(cookies, task):
         if have_time_interval is not None:
             # 需要定时器
             time_interval = get_target_value('timeInterval', data, [])[0]
+            print('-------------', time_interval)
             fun_timer(int(time_interval), get_daily_reward, [cookies, task])
     if data['code'] == '0000':  # 成功获取奖励
         global total_reward
