@@ -186,7 +186,7 @@ def receive_tree_drop(cookies):
     if data.get('awardType', -1) == 1:
         print(f"拾取果树掉落{data['awardNums']}水滴")
 
-    if data['code'] == '0000':  # 成功获取奖励
+    if response.json()['code'] == '0000':  # 成功获取奖励
         global total_reward
         reward_num = get_target_value('prizeNumber', data, [])[0]
         total_reward = total_reward + int(reward_num)
