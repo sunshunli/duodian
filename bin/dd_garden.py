@@ -101,7 +101,6 @@ def str2dict(str_cookie):
 
 def fun_timer(sec, fn, args):
     # print('定时器执行时间:', time.strftime('%Y-%m-%d %H:%M:%S'))
-    global timer
     timer = threading.Timer(sec, fn, args)
     timer.start()
 
@@ -188,7 +187,7 @@ def receive_tree_drop(cookies):
 
     if response.json()['code'] == '0000':  # 成功获取奖励
         global total_reward
-        reward_num = get_target_value('prizeNumber', data, [])[0]
+        reward_num = get_target_value('prizeNumber', response.json(), [])[0]
         total_reward = total_reward + int(reward_num)
     print('receive_tree_drop', data)
 
