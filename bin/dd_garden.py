@@ -623,7 +623,6 @@ def get_tree_info(cookies):
 def summary_info():
     global summary_table
     print(summary_table)
-    sys.exit(0)
 
 
 def run():
