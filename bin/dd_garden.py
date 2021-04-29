@@ -5,13 +5,6 @@
 多点果园自动脚本
 每日早上7点执行领取水滴奖励任务
 每日8-9点 12-14点 18-21点领每日三餐福袋
-
-生成虚拟环境依赖包requirements.txt,用于项目发布。这样即使新的环境没有安装pipenv也可以直接安装依赖包。
-方法1：pipenv run pip freeze > requirements.txt
-方法2：pipenv lock -r --dev > requirements.txt
-
-虚拟环境中导入requirements.txt
-pipenv install -r requirements.txt
 """
 
 import sys
@@ -28,6 +21,7 @@ curpath = os.path.dirname(os.path.realpath(__file__))
 base_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(base_path)
 from utils.dd_cookies import get_cookies
+from utils.tools import get_target_value
 
 
 ###################################################
@@ -55,6 +49,18 @@ cookiesList = get_cookies()
 ###################################################
 ts = datetime.now() - timedelta(hours=1)
 previous_time_stamp = int(time.mktime(ts.timetuple()) * 1000)
+
+###################################################
+# 果树信息
+tree_level = 0  # 果树等级
+tree_id = 0  # 果树id
+fruit_name = ''  # 种植的水果名称
+water_count = 0  # 剩余水滴数量
+progress_percentage = 0  # 浇水进度百分比
+total_reward = 0  # 获取水滴总数
+
+summary_table = {}  # 多账号果树信息及收获信息汇总
+###################################################
 
 
 def get_time():
@@ -130,8 +136,8 @@ def touch_tree_drop(cookies):
         'platformCode': '1',
         'vendorId': '1',
         'storeId': cookies['storeId'],
-        'treeId': '10',
-        'treeLevel': '3',
+        'treeId': tree_id,
+        'treeLevel': tree_level,
         'token': cookies['token'],
         'ticketName': cookies['ticketName'],
     }
@@ -180,6 +186,12 @@ def receive_tree_drop(cookies):
     if data.get('awardType', -1) == 1:
         print(f"拾取果树掉落{data['awardNums']}水滴")
 
+    if data['code'] == '0000':  # 成功获取奖励
+        global total_reward
+        reward_num = get_target_value('prizeNumber', data, [])[0]
+        total_reward = total_reward + int(reward_num)
+    print('receive_tree_drop', data)
+
 
 def daily_sign(cookies):
     # 每日签到领水滴
@@ -214,6 +226,11 @@ def daily_sign(cookies):
     data = response.json()
 
     print(f'执行每日签到任务，{data["message"]}')
+    if data['code'] == '0000':  # 成功获取奖励
+        global total_reward
+        reward_num = get_target_value('prizeNumber', data, [])[0]
+        total_reward = total_reward + int(reward_num)
+    print('daily_sign', data)
 
 
 def daily_seven_clock(cookies):
@@ -250,6 +267,11 @@ def daily_seven_clock(cookies):
     data = response.json()
 
     print(f'执行每日7点领水滴任务，{data["message"]}')
+    if data['code'] == '0000':  # 成功获取奖励
+        global total_reward
+        reward_num = get_target_value('prizeNumber', data, [])[0]
+        total_reward = total_reward + int(reward_num)
+    print('daily_seven_clock', data)
 
 
 def water_tree(cookies):
@@ -273,11 +295,20 @@ def water_tree(cookies):
     }
     try:
         response = requests.get(
-            'https://farm.dmall.com/garden/home/watering', headers=headers, params=params, cookies=cookies, verify=False)
+            'https://farm.dmall.com/garden/home/watering', headers=headers, params=params, cookies=cookies,
+            verify=False)
     except:
         print("网络请求异常,water_tree")
         return
     data = response.json()["data"]
+
+    global progress_percentage
+    global water_count
+    water_count = get_target_value('userDropBalance', data, [])[0]
+    progress_percentage = get_target_value('progressPercentage', data, [])[0]
+    if water_count > 120:
+        time.sleep(3)
+        water_tree(cookies)
 
 
 def get_task_list(cookies, msg):
@@ -368,18 +399,19 @@ def get_daily_reward(cookies, task):
         return
     data = response.json()
     if data['code'] == 'USER_3008':
-        print(data['message'], '开始执行10次浇水任务')
-        i = 0
-        while i < 10:
-            time.sleep(5)
-            water_tree(cookies)
-            i = i + 1
+        print(data['message'], '开始执行次浇水任务')
+        water_tree(cookies)
         get_daily_reward(cookies, task)
     else:
-        data = json.loads(data)
-        if data['data']['haveTimeInterval'] is not None:
+        have_time_interval = get_target_value('haveTimeInterval', data, [])[0]
+        if have_time_interval is not None:
             # 需要定时器
-            fun_timer(data['timeInterval'], get_daily_reward, [cookies, task])
+            time_interval = get_target_value('timeInterval', data, [])[0]
+            fun_timer(int(time_interval), get_daily_reward, [cookies, task])
+    if data['code'] == '0000':  # 成功获取奖励
+        global total_reward
+        reward_num = get_target_value('prizeNumber', data, [])[0]
+        total_reward = total_reward + int(reward_num)
 
 
 def do_task_type1(cookies, task):
@@ -485,8 +517,8 @@ def finish_browser_page(cookies, task):
         print("网络请求异常,finish_browser_page")
         return
     result = response.json()['data']
-    result = json.loads(result)
-    print(f"执行完成{task['taskName']}任务，获得{result['gardenBrowseTaskExtResponse']['browseRewardAmount']}")
+    browse_reward_amount = get_target_value('browseRewardAmount', result, [])[0]
+    print(f"执行完成{task['taskName']}任务，获得{browse_reward_amount}")
 
 
 def finish_browser_task(cookies, task):
@@ -522,8 +554,7 @@ def finish_browser_task(cookies, task):
         print("网络请求异常,daily_sign")
         return
     data = response.json()
-
-    print('浏览任务1', data)
+    # print('浏览任务1', data)
 
 
 def do_task_type5(cookies, task):
@@ -534,19 +565,65 @@ def do_task_type5(cookies, task):
 def do_task_type6(cookies, task):
     print(f"开始执行{task['taskName']}")
     # 执行浇水10次
-    total_water_count = task['canFinishCount']
-    need_water_count = task['finishCount']
-    print(f"执行每日浇水任务，需要完成{total_water_count}次, 目前已完成{need_water_count}次")
+    # total_water_count = task['canFinishCount']
+    # need_water_count = task['finishCount']
+    # print(f"执行每日浇水任务，需要完成{total_water_count}次, 目前已完成{need_water_count}次")
 
-    i = need_water_count
-    while i < total_water_count:
-        time.sleep(5)  # 延迟5秒执行
-        water_tree(cookies)
-        i = i + 1
+    # i = need_water_count
+    # while i < total_water_count:
+    #     time.sleep(5)  # 延迟5秒执行
+    #     water_tree(cookies)
+    #     i = i + 1
+
+    water_tree(cookies)
 
 
 def do_task_type_default(cookies, task):
     print('default')
+
+
+def get_tree_info(cookies):
+    headers = {
+        'Host': 'farm.dmall.com',
+        'Accept': '*/*',
+        'Connection': 'keep-alive',
+        'User-Agent': UserAgent,
+        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,es;q=0.7,ru;q=0.6,it;q=0.5,nl;q=0.4,fr;q=0.3,de;q=0.2,ko;q=0.1,ja;q=0.1',
+        'Referer': 'https://act.dmall.com/',
+        'Accept-Encoding': 'gzip, deflate, br',
+    }
+    params = {
+        'newCustomer': 'false',
+        'platformCode': '1',
+        'token': cookies['token'],
+        'ticketName': cookies['ticketName'],
+        'vendorId': '1',
+        'storeId': cookies['storeId']
+    }
+    try:
+        response = requests.get(
+            'https://farm.dmall.com/garden/home/gardenHome', headers=headers, params=params, cookies=cookies,
+            verify=False)
+    except:
+        print("网络请求异常,water_tree")
+        return
+    data = response.json()
+    global tree_level
+    global fruit_name
+    global tree_id
+    global water_count
+    global progress_percentage
+    progress_percentage = get_target_value('progressPercentage', data, [])[0]
+    water_count = get_target_value('userDropBalance', data, [])[0]
+    tree_level = get_target_value('level', data, [])[0]
+    fruit_name = get_target_value('fruitName', data, [])[0]
+    tree_id = get_target_value('gardenItemId', data, [])[0]
+
+
+def summary_info():
+    global summary_table
+    print(summary_table)
+    sys.exit(0)
 
 
 def run():
@@ -554,11 +631,12 @@ def run():
     for k, v in enumerate(cookiesList):
         print(f">>>>>>>【账号开始{k+1}】\n")
         cookies = str2dict(v)
-
+        # 获取果树初始化信息
+        get_tree_info(cookies)
         # 点击10次果树，间隔5s，拾取随机掉落的水滴
-        for i in range(10):
-            time.sleep(5)
-            touch_tree_drop(cookies)
+        # for i in range(10):
+        #     time.sleep(5)
+        #     touch_tree_drop(cookies)
 
         # 每日签到任务
         daily_sign(cookies)
@@ -573,6 +651,15 @@ def run():
 
         # 获取任务列表, 执行领取奖励
         get_task_list(cookies, '获取任务奖励')
+
+        # global summary_table
+        summary_table[f"账号{k+1}"] = {
+            '果树等级': tree_level,
+            '剩余水滴': water_count,
+            '已完成': str(progress_percentage) + '%',
+            '获取水滴': total_reward
+        }
+    summary_info()
 
 
 if __name__ == "__main__":
