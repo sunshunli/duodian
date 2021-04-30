@@ -22,7 +22,7 @@ curpath = os.path.dirname(os.path.realpath(__file__))
 base_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(base_path)
 from utils.dd_cookies import get_cookies
-from utils.tools import get_target_value, str2dict
+from utils.tools import get_target_value, str2dict, serverJ
 
 ###################################################
 # GitHub action运行需要填写对应的secrets
@@ -47,6 +47,11 @@ conf.read(cfgpath, encoding="utf-8")
 UserAgent = conf['user_agent']['garden_ua']
 cookiesList = get_cookies()
 ###################################################
+currentMonthContinuousDays = ''
+currentMonthAddUpDays = ''
+hasCheckIn = ''
+score = ''
+summary_table = {}
 
 
 def do_signin(cookies):
@@ -80,6 +85,7 @@ def do_signin(cookies):
 
 
 def get_signin_info(cookies):
+    # 获取签到信息
     headers = {
         'Host': 'appapis.dmall.com',
         'Connection': 'keep-alive',
@@ -132,6 +138,15 @@ def get_signin_info(cookies):
                 pass
                 # print('领取连续签到奖励', rewardAddList['rewards'])
 
+    global currentMonthContinuousDays
+    global currentMonthAddUpDays
+    global hasCheckIn
+    global score
+
+    currentMonthContinuousDays = data.get('result').get('data').get('currentMonthContinuousDays')
+    currentMonthAddUpDays = data.get('result').get('data').get('currentMonthAddUpDays')
+    hasCheckIn = data.get('result').get('data').get('hasCheckIn')
+    score = data.get('result').get('data').get('score')
     print('本月已连续签到', data.get('result').get('data').get('currentMonthContinuousDays'))
     print('本月已累计签到', data.get('result').get('data').get('currentMonthAddUpDays'))
     print('今日签到状态', data.get('result').get('data').get('hasCheckIn'))
@@ -142,6 +157,12 @@ def receive_signin_reward(cookies):
     pass
 
 
+def summary_info():
+    print(summary_table)
+
+    serverJ("⏰ 多点签到", json.dumps(summary_table))
+
+
 def run():
     print(f"开始运行多点果园签到脚本", time.strftime('%Y-%m-%d %H:%M:%S'))
     for k, v in enumerate(cookiesList):
@@ -149,6 +170,15 @@ def run():
         cookies = str2dict(v)
         do_signin(cookies)
         get_signin_info(cookies)
+
+        summary_table[f"账号{k+1}"] = {
+            '本月已连续签到': currentMonthContinuousDays,
+            '本月已累计签到': currentMonthAddUpDays,
+            '今日签到': hasCheckIn,
+            '当前多点金币': score
+        }
+
+    summary_info()
 
 
 if __name__ == "__main__":
