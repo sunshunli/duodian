@@ -7,6 +7,30 @@
 """
 
 
+def str2dict(str_cookie):
+    if type(str_cookie) == dict:
+        return str_cookie
+    tmp = str_cookie.split(";")
+    dict_cookie = {}
+    try:
+        for i in tmp:
+            j = i.split("=")
+            if not j[0]:
+                continue
+            dict_cookie[j[0].strip()] = j[1].strip()
+        assert dict_cookie["token"].split("&")[0]
+        # regex = r"&\d\.\d\.\d+"
+        # appid = "&1.0.12"
+        # dict_cookie["1&_device"] = re.sub(
+        #     regex, appid, dict_cookie["1&_device"], 0, re.MULTILINE)
+        # print(dict_cookie["1&_device"])
+
+    except (IndexError, KeyError):
+        print("cookie填写出错 ❌,仔细查看说明")
+        raise
+    return dict_cookie
+
+
 def get_target_value(key, dic, tmp_list):
     """
     :param key: 目标key值

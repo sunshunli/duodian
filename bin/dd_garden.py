@@ -21,7 +21,7 @@ curpath = os.path.dirname(os.path.realpath(__file__))
 base_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(base_path)
 from utils.dd_cookies import get_cookies
-from utils.tools import get_target_value
+from utils.tools import get_target_value, str2dict
 
 
 ###################################################
@@ -73,30 +73,6 @@ def get_time():
     print(f"\n当前时间戳: {mins}")
     print(f"北京时间: {bj_dt}\n\n")
     return mins, date_stamp, _datatime, notify_time
-
-
-def str2dict(str_cookie):
-    if type(str_cookie) == dict:
-        return str_cookie
-    tmp = str_cookie.split(";")
-    dict_cookie = {}
-    try:
-        for i in tmp:
-            j = i.split("=")
-            if not j[0]:
-                continue
-            dict_cookie[j[0].strip()] = j[1].strip()
-        assert dict_cookie["token"].split("&")[0]
-        # regex = r"&\d\.\d\.\d+"
-        # appid = "&1.0.12"
-        # dict_cookie["1&_device"] = re.sub(
-        #     regex, appid, dict_cookie["1&_device"], 0, re.MULTILINE)
-        # print(dict_cookie["1&_device"])
-
-    except (IndexError, KeyError):
-        print("cookie填写出错 ❌,仔细查看说明")
-        raise
-    return dict_cookie
 
 
 def fun_timer(sec, fn, args):
