@@ -5,6 +5,7 @@ def get_cookies():
     cookies1 = ""
     cookies2 = ""
 
+
     cookiesList = [cookies1, ]  # 多账号准备
     if "DD_GARDEN_COOKIE" in os.environ:
         """

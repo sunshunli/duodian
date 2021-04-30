@@ -187,9 +187,9 @@ def receive_tree_drop(cookies):
 
     if response.json()['code'] == '0000':  # 成功获取奖励
         global total_reward
-        reward_num = get_target_value('prizeNumber', response.json(), [])[0]
+        reward_num = get_target_value('awardNums', data, [])[0]
         total_reward = total_reward + int(reward_num)
-    print('receive_tree_drop', data)
+    print('receive_tree_drop', response.json())
 
 
 def daily_sign(cookies):
@@ -305,7 +305,8 @@ def water_tree(cookies):
     global water_count
     water_count = get_target_value('userDropBalance', data, [])[0]
     progress_percentage = get_target_value('progressPercentage', data, [])[0]
-    if water_count > 120:
+    print('water_tree', data)
+    if int(water_count) > 120:
         time.sleep(3)
         water_tree(cookies)
 
@@ -339,6 +340,7 @@ def get_task_list(cookies, msg):
         print(e)
         return
     data = response.json()["data"] and response.json()["data"]["gardenTaskResponseList"]
+    print('获取任务列表', response.json())
     if data:
         for index, task in enumerate(data):
             # 任务未完成状态才执行任务
@@ -361,9 +363,11 @@ def do_task(cookies, task):
     switch = {'1': do_task_type1,  # 注意此处不要加括号
               '2': do_task_type2,
               '5': do_task_type5,
-              '6': do_task_type6
+              '6': do_task_type6,
+              '9': do_task_type2
               }
     choice = task['taskType']
+    print('do_task', choice)
     switch.get(str(choice), do_task_type_default)(cookies, task)
 
 
@@ -402,11 +406,10 @@ def get_daily_reward(cookies, task):
         water_tree(cookies)
         get_daily_reward(cookies, task)
     else:
-        have_time_interval = get_target_value('haveTimeInterval', data, [])[0]
-        if have_time_interval is not None:
+        if 'haveTimeInterval' in data:
             # 需要定时器
             time_interval = get_target_value('timeInterval', data, [])[0]
-            print('-------------', time_interval)
+            print('时间间隔-------------', time_interval)
             fun_timer(int(time_interval), get_daily_reward, [cookies, task])
     if data['code'] == '0000':  # 成功获取奖励
         global total_reward
@@ -424,7 +427,12 @@ def do_task_type1(cookies, task):
 
 def do_task_type2(cookies, task):
     print(f"开始执行{task['taskName']}")
-    url = task['gardenBrowseTaskExtResponse']['taskLoadLink']
+    print(task)
+    if task['taskType'] == 2:
+        url = task['gardenBrowseTaskExtResponse']['taskLoadLink']
+    elif task['taskType'] == 9:
+        url = task['gardenSearchTaskExtResponse']['taskLoadLink']
+
     url_dict = get_url_query(url)
 
     _pageTaskSource = url_dict.get('pageTaskSource')
@@ -478,7 +486,10 @@ def do_task_type2(cookies, task):
 
 def finish_browser_page(cookies, task):
     print(f"开始执行{task['taskName']}")
-    url = task['gardenBrowseTaskExtResponse']['taskLoadLink']
+    if task['taskType'] == 2:
+        url = task['gardenBrowseTaskExtResponse']['taskLoadLink']
+    elif task['taskType'] == 9:
+        url = task['gardenSearchTaskExtResponse']['taskLoadLink']
     url_dict = get_url_query(url)
 
     _pageTaskSource = url_dict.get('pageTaskSource')
@@ -517,7 +528,11 @@ def finish_browser_page(cookies, task):
         print("网络请求异常,finish_browser_page")
         return
     result = response.json()['data']
-    browse_reward_amount = get_target_value('browseRewardAmount', result, [])[0]
+    print(response.json())
+    if task['taskType'] == 2:
+        browse_reward_amount = get_target_value('browseRewardAmount', result, [])[0]
+    elif task['taskType'] == 9:
+        browse_reward_amount = get_target_value('prizeNumber', result, [])[0]
     print(f"执行完成{task['taskName']}任务，获得{browse_reward_amount}")
 
 
