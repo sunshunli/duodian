@@ -98,7 +98,7 @@ def serverJ(title, content):
     print("serverJ服务启动")
     data = {
         "text": title,
-        "desp": content.replace("\n", "\n\n")+"\n\n [打赏作者](https://github.com/Zero-S1/xmly_speed/blob/master/thanks.md)"
+        "desp": content
     }
     response = requests.post(f"https://sc.ftqq.com/{sckey}.send", data=data)
     print(response.text)
