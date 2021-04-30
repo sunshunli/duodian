@@ -16,29 +16,18 @@ import os
 from datetime import datetime, timedelta
 import threading
 from urllib.parse import urlencode, urlparse
+
+
 # 加上这行代码即可，关闭安全请求警告
 requests.packages.urllib3.disable_warnings()
-curpath = os.path.dirname(os.path.realpath(__file__))
 
+curpath = os.path.dirname(os.path.realpath(__file__))
 base_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(base_path)
 from utils.dd_cookies import get_cookies
-from utils.tools import get_target_value, str2dict
+from utils.tools import get_target_value, str2dict, serverJ
 
 
-###################################################
-# GitHub action运行需要填写对应的secrets
-if "BARK" in os.environ and os.environ["BARK"]:
-    BARK = os.environ["BARK"]
-    print("BARK 推送打开")
-if "SCKEY" in os.environ and os.environ["SCKEY"]:
-    BARK = os.environ["SCKEY"]
-    print("serverJ 推送打开")
-if "TG_BOT_TOKEN" in os.environ and os.environ["TG_BOT_TOKEN"] and "TG_USER_ID" in os.environ and os.environ["TG_USER_ID"]:
-    TG_BOT_TOKEN = os.environ["TG_BOT_TOKEN"]
-    TG_USER_ID = os.environ["TG_USER_ID"]
-    print("Telegram 推送打开")
-###################################################
 # 读取配置文件
 cfgpath = os.path.join(curpath, '../conf', 'config.ini')
 # 创建管理对象
@@ -616,6 +605,8 @@ def get_tree_info(cookies):
 def summary_info():
     global summary_table
     print(summary_table)
+
+    serverJ("⏰ 多点果园", json.dumps(summary_table))
 
 
 def run():

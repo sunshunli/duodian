@@ -6,6 +6,28 @@
 @time: 2017/12/22
 """
 
+import os
+import requests
+###################################################
+# 通知服务
+BARK = ''                   # bark服务,自行搜索; secrets可填;形如jfjqxDx3xxxxxxxxSaK的字符串
+SCKEY = ''                  # Server酱的SCKEY; secrets可填
+TG_BOT_TOKEN = ''           # telegram bot token 自行申请
+TG_USER_ID = ''             # telegram 用户ID
+
+# GitHub action运行需要填写对应的secrets
+if "BARK" in os.environ and os.environ["BARK"]:
+    BARK = os.environ["BARK"]
+    print("BARK 推送打开")
+if "SCKEY" in os.environ and os.environ["SCKEY"]:
+    BARK = os.environ["SCKEY"]
+    print("serverJ 推送打开")
+if "TG_BOT_TOKEN" in os.environ and os.environ["TG_BOT_TOKEN"] and "TG_USER_ID" in os.environ and os.environ["TG_USER_ID"]:
+    TG_BOT_TOKEN = os.environ["TG_BOT_TOKEN"]
+    TG_USER_ID = os.environ["TG_USER_ID"]
+    print("Telegram 推送打开")
+###################################################
+
 
 def str2dict(str_cookie):
     if type(str_cookie) == dict:
@@ -59,3 +81,24 @@ def _get_value(key, val, tmp_list):
             get_target_value(key, val_, tmp_list)  # 传入数据的value值是字典，则调用get_target_value
         elif isinstance(val_, (list, tuple)):
             _get_value(key, val_, tmp_list)   # 传入数据的value值是列表或者元组，则调用自身
+
+
+def serverJ(title, content):
+    print("\n")
+    sckey = SCKEY
+    if "SCKEY" in os.environ:
+        """
+        判断是否运行自GitHub action,"SCKEY" 该参数与 repo里的Secrets的名称保持一致
+        """
+        sckey = os.environ["SCKEY"]
+
+    if not sckey:
+        print("server酱服务的SCKEY未设置!!\n取消推送")
+        return
+    print("serverJ服务启动")
+    data = {
+        "text": title,
+        "desp": content.replace("\n", "\n\n")+"\n\n [打赏作者](https://github.com/Zero-S1/xmly_speed/blob/master/thanks.md)"
+    }
+    response = requests.post(f"https://sc.ftqq.com/{sckey}.send", data=data)
+    print(response.text)
