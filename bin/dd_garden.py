@@ -270,7 +270,7 @@ def water_tree(cookies):
 
     global progress_percentage
     global water_count
-    water_count = get_target_value('userDropBalance', data, [])[0]
+    water_count = data.get('gardenUserResponse').get('userDropBalance')
     progress_percentage = get_target_value('progressPercentage', data, [])[0]
     print('water_tree', data)
     if int(water_count) > 120:
