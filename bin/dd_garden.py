@@ -606,7 +606,7 @@ def summary_info():
     global summary_table
     print(summary_table)
 
-    serverJ("⏰ 多点果园", json.dumps(summary_table))
+    serverJ("⏰ 多点果园", json.dumps(summary_table, ensure_ascii=False))
 
 
 def run():

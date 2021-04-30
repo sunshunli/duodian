@@ -160,7 +160,7 @@ def receive_signin_reward(cookies):
 def summary_info():
     print(summary_table)
 
-    serverJ("⏰ 多点签到", json.dumps(summary_table))
+    serverJ("⏰ 多点签到", json.dumps(summary_table, ensure_ascii=False))
 
 
 def run():
