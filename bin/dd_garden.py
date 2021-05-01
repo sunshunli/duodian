@@ -618,9 +618,9 @@ def run():
         # 获取果树初始化信息
         get_tree_info(cookies)
         # 点击10次果树，间隔5s，拾取随机掉落的水滴
-        # for i in range(10):
-        #     time.sleep(5)
-        #     touch_tree_drop(cookies)
+        for i in range(10):
+            time.sleep(5)
+            touch_tree_drop(cookies)
 
         # 每日签到任务
         daily_sign(cookies)
