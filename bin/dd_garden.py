@@ -40,6 +40,7 @@ cookiesList = get_cookies()
 ###################################################
 ts = datetime.now() - timedelta(hours=1)
 previous_time_stamp = int(time.mktime(ts.timetuple()) * 1000)
+cur_time = int(round(time.time() * 1000))
 
 ###################################################
 # 果树信息
@@ -420,11 +421,11 @@ def do_task_type2(cookies, task):
         'env': 'app',
         'androidId': '8543f3d27daa44ad',
         'originBusinessFormat': '1-2-4-8',
-        'channelId': 'dm010205000004',
-        'areaId': '110108',
-        'currentTime': int(round(time.time() * 1000)),
-        'lastInstallTime': '1619415312747',
-        'firstInstallTime': '1619415312747',
+        'channelId': cookies['channelId'],
+        'areaId': cookies['areaId'],
+        'currentTime': str(cur_time),
+        'lastInstallTime': '1619536070832',
+        'firstInstallTime': '1619536070832',
         'storeId': cookies['storeId'],
         'sessionId': cookies['sessionId'],
         'User-Agent': UserAgent,
@@ -471,7 +472,7 @@ def finish_browser_page(cookies, task):
         'token': cookies['token'],
         'uuid': cookies['uuid'],
         'env': 'app',
-        'currentTime': int(round(time.time() * 1000)),
+        'currentTime': str(cur_time),
         'lastInstallTime': '1619415312747',
         'firstInstallTime': '1619415312747',
         'storeId': cookies['storeId'],
@@ -617,9 +618,9 @@ def run():
         # 获取果树初始化信息
         get_tree_info(cookies)
         # 点击10次果树，间隔5s，拾取随机掉落的水滴
-        for i in range(10):
-            time.sleep(5)
-            touch_tree_drop(cookies)
+        # for i in range(10):
+        #     time.sleep(5)
+        #     touch_tree_drop(cookies)
 
         # 每日签到任务
         daily_sign(cookies)
@@ -647,7 +648,6 @@ def run():
 
 if __name__ == "__main__":
     run()
-
 
 
 
