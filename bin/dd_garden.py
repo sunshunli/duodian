@@ -274,11 +274,13 @@ def water_tree(cookies):
         return
     data = response.json()["data"]
 
-    global progress_percentage
-    global water_count
-    water_count = data.get('gardenUserResponse').get('userDropBalance')
-    progress_percentage = data.get('treeInfo').get('progressPercentage')
     print('water_tree', data)
+    if data is not None:
+        global progress_percentage
+        global water_count
+        water_count = data.get('gardenUserResponse').get('userDropBalance')
+        progress_percentage = data.get('treeInfo').get('progressPercentage')
+
     if int(water_count) > 120:
         time.sleep(3)
         water_tree(cookies)
