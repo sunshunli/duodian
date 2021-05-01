@@ -115,6 +115,7 @@ def touch_tree_drop(cookies):
         return
     data = response.json()['data']['config']
     data = json.loads(data)
+    print('果树掉落', data)
     if data.get('awardType', -1) == 1:
         print(f"点击果树掉落{data['awardNums']}水滴")
         # 拾取掉落的水滴
