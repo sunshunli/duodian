@@ -115,14 +115,18 @@ def touch_tree_drop(cookies):
         return
     data = response.json()['data']['config']
     data = json.loads(data)
-    print('果树掉落', data)
+    print('果树掉落', response.json())
     if data.get('awardType', -1) == 1:
         print(f"点击果树掉落{data['awardNums']}水滴")
         # 拾取掉落的水滴
-        receive_tree_drop(cookies)
+        receive_tree_drop(cookies, '25')
+    elif data.get('awardType', -1) == 3:
+        print(f"点击果树掉落{data['awardName']}")
+        # 拾取掉落的优惠券
+        receive_tree_drop(cookies, str(data.get('activityId')))
 
 
-def receive_tree_drop(cookies):
+def receive_tree_drop(cookies, activityid):
     # 拾取果树掉落的水滴
     headers = {
         'Host': 'farm.dmall.com',
@@ -139,7 +143,7 @@ def receive_tree_drop(cookies):
     params = {
         'vendorId': '1',
         'storeId': cookies['storeId'],
-        'descRewardId': '25',
+        'descRewardId': activityid,
         'token': cookies['token'],
         'ticketName': cookies['ticketName'],
     }
