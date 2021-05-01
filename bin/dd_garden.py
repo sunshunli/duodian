@@ -114,14 +114,14 @@ def touch_tree_drop(cookies):
         print("网络请求异常,touch_tree_drop")
         return
     data = response.json()['data']
-    data = json.loads(data)
+    # data = json.loads(data)
     print('果树掉落', response.json())
-    if data.get('config').get('awardType', -1) == 1:
-        print(f"点击果树掉落{data.get('config').get('awardNums')}水滴")
+    if json.loads(data.get('config')).get('awardType', -1) == 1:
+        print(f"点击果树掉落{json.loads(data.get('config')).get('awardNums')}水滴")
         # 拾取掉落的水滴
         receive_tree_drop(cookies, str(data.get('id')))
-    elif data.get('config').get('awardType', -1) == 3:
-        print(f"点击果树掉落{data.get('config').get('awardName')}")
+    elif json.loads(data.get('config')).get('awardType', -1) == 3:
+        print(f"点击果树掉落{json.loads(data.get('config')).get('awardName')}")
         # 拾取掉落的优惠券
         receive_tree_drop(cookies, str(data.get('id')))
 
