@@ -126,7 +126,7 @@ def get_signin_info(cookies):
             # print('领取连续签到奖励', rewardList['rewards'][0].get('rewardName'))
             if rewardList['requiredTimes'] == month_continuous_sign:
                 # print('领取连续签到奖励', rewardList['rewards'])
-                pass
+                receive_signin_reward(cookies, rewardList['taskId'])
     # 循环遍历累计签到状态，判断是否有可领取奖励
     month_add_progress = data.get('result').get('data').get('currentMonthAddProgress')
     for rewardAddList in month_add_progress:
@@ -135,8 +135,8 @@ def get_signin_info(cookies):
             # 再判断是否满足领取要求
             print('领取累计签到奖励', rewardAddList['rewards'][0].get('rewardName'))
             if rewardAddList['requiredTimes'] == month_continuous_sign:
-                pass
                 # print('领取连续签到奖励', rewardAddList['rewards'])
+                receive_signin_reward(cookies, rewardList['taskId'])
 
     global currentMonthContinuousDays
     global currentMonthAddUpDays
@@ -153,8 +153,31 @@ def get_signin_info(cookies):
     print('当前多点金币', data.get('result').get('data').get('score'))
 
 
-def receive_signin_reward(cookies):
-    pass
+def receive_signin_reward(cookies, task_id):
+    headers = {
+        'Host': 'appapis.dmall.com',
+        'Connection': 'keep-alive',
+        'Pragma': 'no-cache',
+        'Cache-Control': 'no-cache',
+        'User-Agent': UserAgent,
+        'Accept': '*/*',
+        'Referer': 'https://act.dmall.com/dac/signIn/index.html?dmShowTitleBar=false&dmfrom=wx&bounces=false&dmTransStatusBar=true&dmNeedLogin=true',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language': 'zh-CN,en-US;q=0.8',
+        'X-Requested-With': 'com.wm.dmall'
+    }
+    params = {
+        'taskId': task_id,
+        'isNew': '1'
+    }
+    try:
+        response = requests.get('https://appapis.dmall.com/static/receiveReward.jsonp', headers=headers, params=params, cookies=cookies, verify=False)
+    except Exception as e:
+        print(e)
+        return
+    response = response.text.lstrip('(').rstrip(')').replace("'", '"')
+    data = json.loads(response)
+    print(data)
 
 
 def summary_info():
