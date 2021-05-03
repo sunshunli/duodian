@@ -187,11 +187,41 @@ def summary_info():
     serverJ("⏰ 多点签到", json.dumps(summary_table, ensure_ascii=False))
 
 
+def get_invite_code(cookies):
+    # 获取签到信息
+    headers = {
+        'Host': 'appapis.dmall.com',
+        'Connection': 'keep-alive',
+        'Pragma': 'no-cache',
+        'Cache-Control': 'no-cache',
+        'User-Agent': UserAgent,
+        'Accept': '*/*',
+        'Referer': 'https://act.dmall.com/dac/signIn/index.html?dmShowTitleBar=false&dmfrom=wx&bounces=false&dmTransStatusBar=true&dmNeedLogin=true',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language': 'zh-CN,en-US;q=0.8',
+        'X-Requested-With': 'com.wm.dmall'
+    }
+    params = {
+        'actId': '52',
+        'linkUrl': 'https%3A%2F%2Fi.dmall.com%2Fkayak-project%2Fmpactivities%2Fhtml%2Finvite%2Finvite.html'
+    }
+    try:
+        response = requests.get('https://appapis.dmall.com/static/generateInviteCode.jsonp', headers=headers, params=params, cookies=cookies, verify=False)
+    except Exception as e:
+        print(e)
+        return
+    response = response.text.lstrip('(').rstrip(')').replace("'", '"')
+    data = json.loads(response)
+    print('邀请码', data.get('result').get('data').get('inviteCode'))
+    print('token', data.get('result').get('data').get('token'))
+
+
 def run():
     print(f"开始运行多点果园签到脚本", time.strftime('%Y-%m-%d %H:%M:%S'))
     for k, v in enumerate(cookiesList):
         print(f">>>>>>>【账号开始{k+1}】\n")
         cookies = str2dict(v)
+        get_invite_code(cookies)
     #     do_signin(cookies)
     #     get_signin_info(cookies)
     #
