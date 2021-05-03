@@ -123,9 +123,9 @@ def get_signin_info(cookies):
         # 首先判断奖励是否被领取, False表示未被领取
         if rewardList['rewardFinished'] == False:
             # 再判断是否满足领取要求
-            # print('领取连续签到奖励', rewardList['rewards'][0].get('rewardName'))
+            print('连续签到奖励', rewardList['rewards'][0].get('rewardName'))
             if rewardList['requiredTimes'] == month_continuous_sign:
-                # print('领取连续签到奖励', rewardList['rewards'])
+                print('领取连续签到奖励', rewardList['rewards'])
                 receive_signin_reward(cookies, rewardList['taskId'])
     # 循环遍历累计签到状态，判断是否有可领取奖励
     month_add_progress = data.get('result').get('data').get('currentMonthAddProgress')
@@ -133,10 +133,10 @@ def get_signin_info(cookies):
         # 首先判断奖励是否被领取, False表示未被领取
         if rewardAddList['rewardFinished'] == False:
             # 再判断是否满足领取要求
-            print('领取累计签到奖励', rewardAddList['rewards'][0].get('rewardName'))
+            print('累计签到奖励', rewardAddList['rewards'][0].get('rewardName'))
             if rewardAddList['requiredTimes'] == month_continuous_sign:
-                # print('领取连续签到奖励', rewardAddList['rewards'])
-                receive_signin_reward(cookies, rewardList['taskId'])
+                print('领取累计签到奖励', rewardAddList['rewards'])
+                receive_signin_reward(cookies, rewardAddList['taskId'])
 
     global currentMonthContinuousDays
     global currentMonthAddUpDays
@@ -170,6 +170,7 @@ def receive_signin_reward(cookies, task_id):
         'taskId': task_id,
         'isNew': '1'
     }
+    print(params)
     try:
         response = requests.get('https://appapis.dmall.com/static/receiveReward.jsonp', headers=headers, params=params, cookies=cookies, verify=False)
     except Exception as e:
