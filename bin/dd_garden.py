@@ -650,6 +650,15 @@ def run():
             '已完成': str(progress_percentage) + '%',
             '获取水滴': total_reward
         }
+        # 初始化全局变量
+        global tree_level
+        global water_count
+        global progress_percentage
+        global total_reward
+        tree_level = ''
+        water_count = ''
+        progress_percentage = ''
+        total_reward = ''
     summary_info()
 
 
