@@ -222,17 +222,17 @@ def run():
         print(f">>>>>>>【账号开始{k+1}】\n")
         cookies = str2dict(v)
         get_invite_code(cookies)
-    #     do_signin(cookies)
-    #     get_signin_info(cookies)
-    #
-    #     summary_table[f"账号{k+1}"] = {
-    #         '本月已连续签到': currentMonthContinuousDays,
-    #         '本月已累计签到': currentMonthAddUpDays,
-    #         '今日签到': hasCheckIn,
-    #         '当前多点金币': score
-    #     }
-    #
-    # summary_info()
+        do_signin(cookies)
+        get_signin_info(cookies)
+
+        summary_table[f"账号{k+1}"] = {
+            '本月已连续签到': currentMonthContinuousDays,
+            '本月已累计签到': currentMonthAddUpDays,
+            '今日签到': hasCheckIn,
+            '当前多点金币': score
+        }
+
+    summary_info()
 
 
 if __name__ == "__main__":
