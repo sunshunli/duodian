@@ -504,11 +504,12 @@ def finish_browser_page(cookies, task):
         return
     result = response.json()['data']
     print(response.json())
-    if task['taskType'] == 2:
-        browse_reward_amount = get_target_value('browseRewardAmount', result, [])[0]
-    elif task['taskType'] == 9:
-        browse_reward_amount = get_target_value('prizeNumber', result, [])[0]
-    print(f"执行完成{task['taskName']}任务，获得{browse_reward_amount}")
+    if result is not None:
+        if task['taskType'] == 2:
+            browse_reward_amount = get_target_value('browseRewardAmount', result, [])[0]
+        elif task['taskType'] == 9:
+            browse_reward_amount = get_target_value('prizeNumber', result, [])[0]
+        print(f"执行完成{task['taskName']}任务，获得{browse_reward_amount}")
 
 
 def finish_browser_task(cookies, task):
