@@ -619,6 +619,10 @@ def summary_info():
 
 def run():
     print(f"开始运行多点果园自动执行脚本", time.strftime('%Y-%m-%d %H:%M:%S'))
+    global tree_level
+    global water_count
+    global progress_percentage
+    global total_reward
     for k, v in enumerate(cookiesList):
         print(f">>>>>>>【账号开始{k+1}】\n")
         cookies = str2dict(v)
@@ -651,10 +655,7 @@ def run():
             '获取水滴': total_reward
         }
         # 初始化全局变量
-        global tree_level
-        global water_count
-        global progress_percentage
-        global total_reward
+
         tree_level = ''
         water_count = ''
         progress_percentage = ''
