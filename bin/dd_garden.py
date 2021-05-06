@@ -161,7 +161,7 @@ def receive_tree_drop(cookies, activityid):
     if response.json()['code'] == '0000':  # 成功获取奖励
         global total_reward
         reward_num = get_target_value('awardNums', data, [])[0]
-        total_reward = total_reward + int(reward_num)
+        total_reward = int(total_reward) + int(reward_num)
     print('receive_tree_drop', response.json())
 
 
@@ -201,7 +201,7 @@ def daily_sign(cookies):
     if data['code'] == '0000':  # 成功获取奖励
         global total_reward
         reward_num = get_target_value('prizeNumber', data, [])[0]
-        total_reward = total_reward + int(reward_num)
+        total_reward = int(total_reward) + int(reward_num)
     print('daily_sign', data)
 
 
@@ -242,7 +242,7 @@ def daily_seven_clock(cookies):
     if data['code'] == '0000':  # 成功获取奖励
         global total_reward
         reward_num = get_target_value('prizeNumber', data, [])[0]
-        total_reward = total_reward + int(reward_num)
+        total_reward = int(total_reward) + int(reward_num)
     print('daily_seven_clock', data)
 
 
@@ -389,7 +389,7 @@ def get_daily_reward(cookies, task):
     if data['code'] == '0000':  # 成功获取奖励
         global total_reward
         reward_num = get_target_value('prizeNumber', data, [])[0]
-        total_reward = total_reward + int(reward_num)
+        total_reward = int(total_reward) + int(reward_num)
 
 
 def do_task_type1(cookies, task):
@@ -658,9 +658,9 @@ def run():
         # 初始化全局变量
 
         tree_level = ''
-        water_count = ''
+        water_count = 0
         progress_percentage = ''
-        total_reward = ''
+        total_reward = 0
     summary_info()
 
 
