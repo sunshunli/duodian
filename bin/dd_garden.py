@@ -320,7 +320,7 @@ def get_task_list(cookies, msg):
         for index, task in enumerate(data):
             # 任务未完成状态才执行任务
             if task['taskStatus'] == 1:  # 1 任务未执行 2 任务执行完，可以领取奖励 0 任务不可执行
-                if task['taskId'] == 38: # 执行双单有礼
+                if task['taskId'] == 38:  # 执行双单有礼
                     finish_browser_task(cookies, task)
                 else:
                     do_task(cookies, task)
