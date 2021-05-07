@@ -9,12 +9,9 @@
 import sys
 import requests
 import json
-import time
 import configparser
 import os
-# from datetime import datetime, timedelta
-# import threading
-from urllib.parse import urlencode, urlparse
+import time
 # 加上这行代码即可，关闭安全请求警告
 requests.packages.urllib3.disable_warnings()
 
@@ -23,6 +20,7 @@ base_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(base_path)
 from utils.dd_cookies import get_cookies
 from utils.tools import get_target_value, str2dict, serverJ
+
 
 ###################################################
 # GitHub action运行需要填写对应的secrets

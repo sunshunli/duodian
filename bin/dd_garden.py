@@ -116,14 +116,17 @@ def touch_tree_drop(cookies):
     data = response.json()['data']
     # data = json.loads(data)
     print('果树掉落', response.json())
-    if json.loads(data.get('config')).get('awardType', -1) == 1:
-        print(f"点击果树掉落{json.loads(data.get('config')).get('awardNums')}水滴")
-        # 拾取掉落的水滴
-        receive_tree_drop(cookies, str(data.get('id')))
-    elif json.loads(data.get('config')).get('awardType', -1) == 3:
-        print(f"点击果树掉落{json.loads(data.get('config')).get('awardName')}")
-        # 拾取掉落的优惠券
-        receive_tree_drop(cookies, str(data.get('id')))
+    try:
+        if json.loads(data.get('config')).get('awardType', -1) == 1:
+            print(f"点击果树掉落{json.loads(data.get('config')).get('awardNums')}水滴")
+            # 拾取掉落的水滴
+            receive_tree_drop(cookies, str(data.get('id')))
+        elif json.loads(data.get('config')).get('awardType', -1) == 3:
+            print(f"点击果树掉落{json.loads(data.get('config')).get('awardName')}")
+            # 拾取掉落的优惠券
+            receive_tree_drop(cookies, str(data.get('id')))
+    except:
+        print('touch_tree_drop 数据处理异常')
 
 
 def receive_tree_drop(cookies, activityid):
@@ -281,7 +284,7 @@ def water_tree(cookies):
         water_count = data.get('gardenUserResponse').get('userDropBalance')
         progress_percentage = data.get('treeInfo').get('progressPercentage')
 
-    if int(water_count) > 120:
+    if int(water_count) > 20:
         time.sleep(3)
         water_tree(cookies)
 
