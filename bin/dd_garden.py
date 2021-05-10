@@ -631,42 +631,41 @@ def run():
     for k, v in enumerate(cookiesList):
         print(f">>>>>>>【账号开始{k+1}】\n")
         cookies = str2dict(v)
+        # 获取果树初始化信息
         get_tree_info(cookies)
-    #     # 获取果树初始化信息
-    #     get_tree_info(cookies)
-    #     # 点击10次果树，间隔5s，拾取随机掉落的水滴
-    #     for i in range(10):
-    #         time.sleep(5)
-    #         touch_tree_drop(cookies)
-    #
-    #     # 每日签到任务
-    #     daily_sign(cookies)
-    #
-    #     # 每日7点领水滴
-    #     daily_seven_clock(cookies)
-    #
-    #     # 获取任务列表
-    #     get_task_list(cookies, '获取任务列表')
-    #
-    #     time.sleep(30)
-    #
-    #     # 获取任务列表, 执行领取奖励
-    #     get_task_list(cookies, '获取任务奖励')
-    #
-    #     # global summary_table
-    #     summary_table[f"账号{k+1}"] = {
-    #         '果树等级': tree_level,
-    #         '剩余水滴': water_count,
-    #         '已完成': str(progress_percentage) + '%',
-    #         '获取水滴': total_reward
-    #     }
-    #     # 初始化全局变量
-    #
-    #     tree_level = ''
-    #     water_count = 0
-    #     progress_percentage = ''
-    #     total_reward = 0
-    # summary_info()
+        # 点击10次果树，间隔5s，拾取随机掉落的水滴
+        for i in range(10):
+            time.sleep(5)
+            touch_tree_drop(cookies)
+
+        # 每日签到任务
+        daily_sign(cookies)
+
+        # 每日7点领水滴
+        daily_seven_clock(cookies)
+
+        # 获取任务列表
+        get_task_list(cookies, '获取任务列表')
+
+        time.sleep(30)
+
+        # 获取任务列表, 执行领取奖励
+        get_task_list(cookies, '获取任务奖励')
+
+        # global summary_table
+        summary_table[f"账号{k+1}"] = {
+            '果树等级': tree_level,
+            '剩余水滴': water_count,
+            '已完成': str(progress_percentage) + '%',
+            '获取水滴': total_reward
+        }
+        # 初始化全局变量
+
+        tree_level = ''
+        water_count = 0
+        progress_percentage = ''
+        total_reward = 0
+    summary_info()
 
 
 if __name__ == "__main__":
