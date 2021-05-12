@@ -237,9 +237,11 @@ def get_account_signin_reward(cookies):
         }
         driver.add_cookie(cookie)
     time.sleep(10)
-    d_track_data = driver.execute_script('return window.DmallTracker.getDTrackData()')
-    env = driver.execute_script('return window.DmallTracker.getBaseConfigStatistics()')
-    driver.close()
+    try:
+        d_track_data = driver.execute_script('return window.DmallTracker.getDTrackData()')
+        env = driver.execute_script('return window.DmallTracker.getBaseConfigStatistics()')
+    finally:
+        driver.close()
 
     headers = {
         'Host': 'pandoragw.dmall.com',
@@ -261,13 +263,13 @@ def get_account_signin_reward(cookies):
         'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,es;q=0.7,ru;q=0.6,it;q=0.5,nl;q=0.4,fr;q=0.3,de;q=0.2,ko;q=0.1,ja;q=0.1',
     }
     data1 = {
-        'taskId': 'C3gCwBMt6ZDjPTR0oA', # C3gCwGNxQ6obyLwQNQ
+        'taskId': 'C3gCwBMt6ZDjPTR0oA',
         'rewardItemId': '81431',
         'env': env,
         'd_track_data': d_track_data
     }
     data2 = {
-        'taskId': 'C3gCwBMt6ZDjPTR0oA', # C3gCwGNxQ6obyLwQNQ
+        'taskId': 'C3gCwGNxQ6obyLwQNQ',
         'rewardItemId': '81431',
         'env': env,
         'd_track_data': d_track_data
