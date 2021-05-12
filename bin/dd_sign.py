@@ -223,7 +223,7 @@ def get_account_signin_reward(cookies):
     options.add_argument(f'user-agent={UserAgent}')
 
     project_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-    driver_path = os.path.join(project_path, 'utils', 'chromedriver_win32_2', 'geckodriver')
+    driver_path = os.path.join(project_path, 'utils', 'chromedriver_win32_2', 'geckodriver.exe')
     driver = webdriver.Firefox(options=options, executable_path=driver_path)
     driver.get('https://a.dmall.com/act/L76rkBq0UhGOyuV.html?nopos=0&tpc=a_202662')
     driver.delete_all_cookies()
