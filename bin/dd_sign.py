@@ -217,6 +217,9 @@ def get_invite_code(cookies):
 
 
 def get_account_signin_reward(cookies):
+    """
+    通过使用firefox无头浏览器加载页面获取必要参数，然后请求接口获取累计签到获取水滴奖励
+    """
     options = webdriver.FirefoxOptions()
     options.add_argument('-headless')
     options.add_argument('--disable-gpu')
@@ -286,25 +289,27 @@ def get_account_signin_reward(cookies):
     print(result2)
 
 
-
 def run():
     print(f"开始运行多点果园签到脚本", time.strftime('%Y-%m-%d %H:%M:%S'))
     for k, v in enumerate(cookiesList):
         print(f">>>>>>>【账号开始{k+1}】\n")
         cookies = str2dict(v)
+
+        get_invite_code(cookies)
+        do_signin(cookies)
+        get_signin_info(cookies)
+
+        # 获取连续签到7天和11天奖励
         get_account_signin_reward(cookies)
-    #     get_invite_code(cookies)
-    #     do_signin(cookies)
-    #     get_signin_info(cookies)
-    #
-    #     summary_table[f"账号{k+1}"] = {
-    #         '本月已连续签到': currentMonthContinuousDays,
-    #         '本月已累计签到': currentMonthAddUpDays,
-    #         '今日签到': hasCheckIn,
-    #         '当前多点金币': score
-    #     }
-    #
-    # summary_info()
+
+        summary_table[f"账号{k+1}"] = {
+            '本月已连续签到': currentMonthContinuousDays,
+            '本月已累计签到': currentMonthAddUpDays,
+            '今日签到': hasCheckIn,
+            '当前多点金币': score
+        }
+
+    summary_info()
 
 
 if __name__ == "__main__":
