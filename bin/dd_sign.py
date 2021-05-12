@@ -12,6 +12,8 @@ import json
 import configparser
 import os
 import time
+from urllib.parse import urlencode, urlparse
+from selenium import webdriver
 # 加上这行代码即可，关闭安全请求警告
 requests.packages.urllib3.disable_warnings()
 
@@ -214,23 +216,83 @@ def get_invite_code(cookies):
     print('token', data.get('result').get('data').get('token'))
 
 
+def get_account_signin_reward(cookies):
+    options = webdriver.FirefoxOptions()
+    options.add_argument('-headless')
+    options.add_argument('--disable-gpu')
+    options.add_argument(f'user-agent={UserAgent}')
+
+    project_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    driver_path = os.path.join(project_path, 'utils', 'chromedriver_win32_2', 'geckodriver')
+    driver = webdriver.Firefox(options=options, executable_path=driver_path)
+    driver.get('https://a.dmall.com/act/L76rkBq0UhGOyuV.html?nopos=0&tpc=a_202662')
+    driver.delete_all_cookies()
+    for k, v in cookies.items():
+        cookie = {
+            'name': k,
+            'value': v,
+            'domain': '.dmall.com',
+            'path': '/'
+        }
+        driver.add_cookie(cookie)
+    time.sleep(10)
+    d_track_data = driver.execute_script('return window.DmallTracker.getDTrackData()')
+    env = driver.execute_script('return window.DmallTracker.getBaseConfigStatistics()')
+    driver.close()
+
+    headers = {
+        'Host': 'pandoragw.dmall.com',
+        'Connection': 'keep-alive',
+        'Content-Length': '2601',
+        'Pragma': 'no-cache',
+        'Cache-Control': 'no-cache',
+        'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="90", "Google Chrome";v="90"',
+        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'sec-ch-ua-mobile': '?1',
+        'User-Agent': UserAgent,
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'Origin': 'https://a.dmall.com',
+        'Sec-Fetch-Site': 'same-site',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Dest': 'empty',
+        'Referer': 'https://a.dmall.com/',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,es;q=0.7,ru;q=0.6,it;q=0.5,nl;q=0.4,fr;q=0.3,de;q=0.2,ko;q=0.1,ja;q=0.1',
+    }
+    data = {
+        'taskId': 'C3gCwBMt6ZDjPTR0oA',
+        'rewardItemId': '81431',
+        'env': env,
+        'd_track_data': d_track_data
+    }
+    try:
+        response = requests.post('https://pandoragw.dmall.com/alps/pickup', headers=headers, data=urlencode(data), cookies=cookies, verify=False)
+    except:
+        print("网络请求异常,do_task_type2")
+        return
+    result = response.json()
+    print('test', result)
+
+
+
 def run():
     print(f"开始运行多点果园签到脚本", time.strftime('%Y-%m-%d %H:%M:%S'))
     for k, v in enumerate(cookiesList):
         print(f">>>>>>>【账号开始{k+1}】\n")
         cookies = str2dict(v)
-        get_invite_code(cookies)
-        do_signin(cookies)
-        get_signin_info(cookies)
-
-        summary_table[f"账号{k+1}"] = {
-            '本月已连续签到': currentMonthContinuousDays,
-            '本月已累计签到': currentMonthAddUpDays,
-            '今日签到': hasCheckIn,
-            '当前多点金币': score
-        }
-
-    summary_info()
+        get_account_signin_reward(cookies)
+    #     get_invite_code(cookies)
+    #     do_signin(cookies)
+    #     get_signin_info(cookies)
+    #
+    #     summary_table[f"账号{k+1}"] = {
+    #         '本月已连续签到': currentMonthContinuousDays,
+    #         '本月已累计签到': currentMonthAddUpDays,
+    #         '今日签到': hasCheckIn,
+    #         '当前多点金币': score
+    #     }
+    #
+    # summary_info()
 
 
 if __name__ == "__main__":

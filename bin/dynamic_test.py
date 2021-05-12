@@ -1,10 +1,18 @@
 import os
 import sys
+import requests
 import time
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+
 import configparser
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
+
+from selenium.webdriver import Firefox
 
 curpath = os.path.dirname(os.path.realpath(__file__))
 base_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -51,35 +59,74 @@ UserAgent = conf['user_agent']['garden_ua']
 #     webdriver.DesiredCapabilities.PHANTOMJS['phantomjs.page.customHeaders.{}'.format(key)] = headers[key]
 
 
+def get_sign_reward(cookies, sessionid, uuid):
+    pass
+    # headers = {
+    #     'Host': 'pandoragw.dmall.com',
+    #     'Accept': 'application/json, text/javascript, */*; q=0.01',
+    #     'Connection': 'keep-alive',
+    #     'Origin': 'https://a.dmall.com',
+    #     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+    #     'Referer': 'https://a.dmall.com/act/L76rkBq0UhGOyuV.html?nopos=0&tpc=a_202662',
+    #     'User-Agent': UserAgent,
+    #     'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,es;q=0.7,ru;q=0.6,it;q=0.5,nl;q=0.4,fr;q=0.3,de;q=0.2,ko;q=0.1,ja;q=0.1',
+    #     'Accept-Encoding': 'gzip, deflate, br',
+    #     'X-Requested-With': 'com.wm.dmall'
+    # }
+    #_payload = f"""{{'source': {_pageTaskSource}, 'taskId': {_pageTaskId}, 'taskType': {_pageTaskType}}}"""
+    # data = {
+    #     'taskId': 'C35_MSKWhPcglL0LYg',
+    #     'rewardItemId': '81431',
+    #     'env': _payload,
+    #     'd_track_data': ''
+    # }
+    # try:
+    #     response = requests.post('https://appapi.dmall.com/app/farm/queryTask', headers=headers, data=urlencode(data), verify=False)
+    # except:
+    #     print("网络请求异常,do_task_type2")
+    #     return
+    # result = response.json()
+
+
 def run():
     for k, v in enumerate(cookiesList):
         print(f">>>>>>>【账号开始{k+1}】\n")
         cookies = str2dict(v)
-        chrome_options = Options()
-        chrome_options.add_argument('--headless')
-        chrome_options.add_argument('--disable-gpu')
-        # 以最高权限运行
-        chrome_options.add_argument('--no-sandbox')
-        # 不加载图片, 提升速度
-        chrome_options.add_argument('blink-settings=imagesEnabled=false')
-        chrome_options.add_argument('User-Agent=Mozilla/5.0 (Linux; Android 5.1.1; PCRT00 Build/LMY47I; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/52.0.2743.100 Safari/537.36 Dmall/5.0.6')
+        # chrome_options = Options()
+        options = webdriver.FirefoxOptions()
+        options.add_argument('-headless')
+        options.add_argument('--disable-gpu')
+        options.add_argument('user-agent=Mozilla/5.0 (Linux; Android 5.1.1; LYA-AL10 Build/LMY47I; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/52.0.2743.100 Mobile Safari/537.36 Dmall/5.0.4')
 
-        chrome_options.add_argument('lang=zh_CN.UTF-8')
+        # chrome_options.add_argument('window-size=1920x1080')
+        # chrome_options.add_argument('--start-maximized')
+        # chrome_options.add_argument('--headless')
+        # chrome_options.add_argument('--disable-gpu')
+        # chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+        # 以最高权限运行
+        # chrome_options.add_argument('--no-sandbox')
+        # 不加载图片, 提升速度
+        # chrome_options.add_argument('blink-settings=imagesEnabled=false')
+        # chrome_options.add_argument('user-agent=Mozilla/5.0 (Linux; Android 5.1.1; LYA-AL10 Build/LMY47I; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/52.0.2743.100 Mobile Safari/537.36 Dmall/5.0.4')
+
+        # chrome_options.add_argument('lang=zh_CN.UTF-8')
 
 
 
 
         project_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-        driver_path = os.path.join(project_path, 'utils', 'chromedriver_win32_2', 'chromedriver.exe')
-        driver = webdriver.Chrome(options=chrome_options, executable_path=driver_path)
+        # driver_path = os.path.join(project_path, 'utils', 'chromedriver_win32_2', 'chromedriver.exe')
+        driver_path = os.path.join(project_path, 'utils', 'chromedriver_win32_2', 'geckodriver.exe')
+        # driver = webdriver.Chrome(options=chrome_options, executable_path=driver_path)
+        driver = Firefox(firefox_options=options, executable_path=driver_path)
         # driver = webdriver.Chrome(executable_path=driver_path, desired_capabilities=dcap)
         # script = "var page = this; page.clearCookies();"
         # driver.command_executor._commands['executePhantomScript'] = ('POST', '/session/$sessionId/phantom/execute')
         # driver.execute('executePhantomScript', {'script': script, 'args': []})
         # expiration = datetime.datetime.now() + datetime.timedelta(days=30)
-        driver.get('https://a.dmall.com/act/mhwQ23zOk8t70N.html?nopos=0&tpc=a_201242')
+        driver.get('https://a.dmall.com/act/L76rkBq0UhGOyuV.html?nopos=0&tpc=a_202662')
         driver.delete_all_cookies()
-        driver.execute_script('localStorage.clear();')
+        # driver.execute_script('localStorage.clear();')
         for k, v in cookies.items():
             cookie = {
                 'name': k,
@@ -96,21 +143,26 @@ def run():
         # print(user_agent)
         # 获取请求头信息
          # 查看请求头是否更改。
-        # driver.implicitly_wait(10) # seconds
-        d_track_data = driver.execute_script('return window.DmallTracker.getDTrackData()')
+        # d_track_data = driver.execute_script('return window.DmallTracker.getDTrackData()')
+        # driver.implicitly_wait(30)
+        # env = driver.execute_script('return window.DmallTracker.getBaseConfigStatistics();')
+
+        # driver.quit()
+        # locator = (By.CLASS_NAME, 'image-area-template1-warpper')
+        # try:
+        #     WebDriverWait(driver, 20, 0.5).until(EC.presence_of_element_located(locator))
+        #     print(driver.get_log('browser'))
+        #
+        #     env = driver.execute_script('return window.DmallTracker.getBaseConfigStatistics()')
+        #     print(driver.page_source)
+        # finally:
+        #     driver.close()
+        # print(driver.page_source)
+        time.sleep(10)
         env = driver.execute_script('return window.DmallTracker.getBaseConfigStatistics()')
-        print('d_track_data', d_track_data)
-        print('env', env)
+        print(env)
+        driver.close()
 
-        driver.quit()
-
-#         try:
-#     # 页面一直循环，直到 id="myDynamicElement" 出现
-#     element = WebDriverWait(driver, 10).until(
-#         EC.presence_of_element_located((By.ID, "myDynamicElement"))
-#     )
-# finally:
-# driver.quit()
 
 
 
