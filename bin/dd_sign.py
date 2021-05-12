@@ -260,19 +260,28 @@ def get_account_signin_reward(cookies):
         'Accept-Encoding': 'gzip, deflate, br',
         'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,es;q=0.7,ru;q=0.6,it;q=0.5,nl;q=0.4,fr;q=0.3,de;q=0.2,ko;q=0.1,ja;q=0.1',
     }
-    data = {
-        'taskId': 'C3gCwBMt6ZDjPTR0oA',
+    data1 = {
+        'taskId': 'C3gCwBMt6ZDjPTR0oA', # C3gCwGNxQ6obyLwQNQ
+        'rewardItemId': '81431',
+        'env': env,
+        'd_track_data': d_track_data
+    }
+    data2 = {
+        'taskId': 'C3gCwBMt6ZDjPTR0oA', # C3gCwGNxQ6obyLwQNQ
         'rewardItemId': '81431',
         'env': env,
         'd_track_data': d_track_data
     }
     try:
-        response = requests.post('https://pandoragw.dmall.com/alps/pickup', headers=headers, data=urlencode(data), cookies=cookies, verify=False)
+        response1 = requests.post('https://pandoragw.dmall.com/alps/pickup', headers=headers, data=urlencode(data1), cookies=cookies, verify=False)
+        response2 = requests.post('https://pandoragw.dmall.com/alps/pickup', headers=headers, data=urlencode(data2), cookies=cookies, verify=False)
     except:
         print("网络请求异常,do_task_type2")
         return
-    result = response.json()
-    print('test', result)
+    result1 = response1.json()
+    result2 = response2.json()
+    print(result1)
+    print(result2)
 
 
 
