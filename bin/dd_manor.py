@@ -36,6 +36,8 @@ steal_amount = 0  # 累计当天偷取次数
 can_steal_list = []  # 累计获取可以偷取的对象
 stealLimit = 0  # 可以偷取邻居次数
 stealCount = 0  # 已偷取的次数
+totalLevelApplyFertilizerAmount = 0  # 目前已经施肥总量
+totalLevelNeedFertilizerAmount = 0  # 植物成熟所需肥料总量
 summary_table = {}
 
 
@@ -318,10 +320,13 @@ def do_deal_neighbor(cookies, neighbor):
 
 def do_fertilization(cookies):
     """
-    偷取邻居化肥
+    施肥
     """
+    global totalLevelApplyFertilizerAmount
+    global totalLevelNeedFertilizerAmount
     global totalRewardAmount
     global can_steal_list
+
     headers = {
         'Host': 'farm.dmall.com',
         'Connection': 'keep-alive',
@@ -349,7 +354,10 @@ def do_fertilization(cookies):
         return
     data = json.loads(response.text)
     print(data)
+
     if data.get('data') != None:
+        totalLevelApplyFertilizerAmount = data.get('data').get('userCrop').get('totalLevelApplyFertilizerAmount')
+        totalLevelNeedFertilizerAmount = data.get('data').get('userCrop').get('totalLevelNeedFertilizerAmount')
         time.sleep(5)
         do_fertilization(cookies)
 
@@ -364,6 +372,8 @@ def summary_info():
 def run():
     print(f"开始运行多点庄园自动执行脚本", time.strftime('%Y-%m-%d %H:%M:%S'))
     global totalRewardAmount
+    global totalLevelApplyFertilizerAmount
+    global totalLevelNeedFertilizerAmount
     for k, v in enumerate(cookiesList):
         print(f">>>>>>>【账号开始{k+1}】\n")
         cookies = str2dict(v)
@@ -382,7 +392,8 @@ def run():
 
         # global summary_table
         summary_table[f"账号{k+1}"] = {
-            '获取总化肥数:': totalRewardAmount
+            '获取总化肥数:': totalRewardAmount,
+            '总完成率:': f'{totalLevelApplyFertilizerAmount/totalLevelNeedFertilizerAmount}'
         }
         # 初始化全局变量
         totalRewardAmount = 0
