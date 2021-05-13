@@ -2,7 +2,7 @@ name: 多点庄园
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 0,23 * * *'
   watch:
     types: [started]
 jobs:
