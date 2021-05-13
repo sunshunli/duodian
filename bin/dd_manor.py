@@ -37,7 +37,7 @@ can_steal_list = []  # 累计获取可以偷取的对象
 stealLimit = 0  # 可以偷取邻居次数
 stealCount = 0  # 已偷取的次数
 totalLevelApplyFertilizerAmount = 0  # 目前已经施肥总量
-totalLevelNeedFertilizerAmount = 0  # 植物成熟所需肥料总量
+totalLevelNeedFertilizerAmount = 660  # 植物成熟所需肥料总量
 summary_table = {}
 
 
