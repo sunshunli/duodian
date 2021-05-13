@@ -240,6 +240,9 @@ def get_account_signin_reward(cookies):
         }
         driver.add_cookie(cookie)
     time.sleep(10)
+
+    d_track_data = ''
+    env = ''
     try:
         d_track_data = driver.execute_script('return window.DmallTracker.getDTrackData()')
         env = driver.execute_script('return window.DmallTracker.getBaseConfigStatistics()')
