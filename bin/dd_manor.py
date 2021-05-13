@@ -397,6 +397,7 @@ def run():
         }
         # 初始化全局变量
         totalRewardAmount = 0
+        totalLevelApplyFertilizerAmount = 0
 
     summary_info()
 
