@@ -52,7 +52,8 @@ currentMonthAddUpDays = ''
 hasCheckIn = ''
 score = ''
 summary_table = {}
-
+d_track_data = ''
+env = ''
 
 def do_signin(cookies):
     # 签到有礼
@@ -220,6 +221,8 @@ def get_account_signin_reward(cookies):
     """
     通过使用firefox无头浏览器加载页面获取必要参数，然后请求接口获取累计签到获取水滴奖励
     """
+    global d_track_data
+    global env
     options = webdriver.FirefoxOptions()
     options.add_argument('-headless')
     options.add_argument('--disable-gpu')
@@ -239,10 +242,8 @@ def get_account_signin_reward(cookies):
             'path': '/'
         }
         driver.add_cookie(cookie)
-    time.sleep(10)
+    time.sleep(20)
 
-    d_track_data = ''
-    env = ''
     try:
         d_track_data = driver.execute_script('return window.DmallTracker.getDTrackData()')
         env = driver.execute_script('return window.DmallTracker.getBaseConfigStatistics()')
