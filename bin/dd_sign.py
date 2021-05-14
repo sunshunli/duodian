@@ -304,7 +304,7 @@ def run():
         get_signin_info(cookies)
 
         # 获取连续签到7天和11天奖励
-        get_account_signin_reward(cookies)
+        # get_account_signin_reward(cookies)
 
         summary_table[f"账号{k+1}"] = {
             '本月已连续签到': currentMonthContinuousDays,
