@@ -360,6 +360,43 @@ def do_fertilization(cookies):
         totalLevelNeedFertilizerAmount = data.get('data').get('userCrop').get('totalLevelNeedFertilizerAmount')
         time.sleep(5)
         do_fertilization(cookies)
+    elif data.get('code') == 'FARM2014':
+        # 播种香蕉
+        do_plant(cookies)
+
+
+def do_plant(cookies):
+    # 播种香蕉
+    headers = {
+        'Host': 'farm.dmall.com',
+        'Connection': 'keep-alive',
+        'Pragma': 'no-cache',
+        'Cache-Control': 'no-cache',
+        'User-Agent': UserAgent,
+        'Accept': '*/*',
+        'Referer': 'https://act.dmall.com/dac/mygarden/index.html?dmfrom=wx&dmTransStatusBar=true&dmShowTitleBar=false&bounces=false&dmNeedLogin=true',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language': 'zh-CN,en-US;q=0.8',
+        'X-Requested-With': 'com.wm.dmall'
+    }
+    params = {
+        'landId': '1',
+        'cropId': '143',
+        'token': cookies['token'],
+        'ticketName': cookies['ticketName'],
+        'vendorId': '1',
+        'storeId': cookies['storeId'],
+    }
+    try:
+        response = requests.get('https://farm.dmall.com/farm/crop/plant', headers=headers, params=params, cookies=cookies, verify=False)
+    except Exception as e:
+        print(e)
+        return
+    data = json.loads(response.text)
+    print('do_plant', data)
+
+    if data.get('data') != None and data.get('data').get('fertilizerAmount') > 0:
+        do_fertilization(cookies)
 
 
 def summary_info():
