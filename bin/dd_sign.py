@@ -213,8 +213,9 @@ def get_invite_code(cookies):
         return
     response = response.text.lstrip('(').rstrip(')').replace("'", '"')
     data = json.loads(response)
-    print('邀请码', data.get('result').get('data').get('inviteCode'))
-    print('token', data.get('result').get('data').get('token'))
+    print(data)
+    # print('邀请码', data.get('result').get('data').get('inviteCode'))
+    # print('token', data.get('result').get('data').get('token'))
 
 
 def get_account_signin_reward(cookies):
@@ -229,7 +230,7 @@ def get_account_signin_reward(cookies):
     options.add_argument(f'user-agent={UserAgent}')
 
     project_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-    driver_path = os.path.join(project_path, 'utils', 'chromedriver_win32_2', 'geckodriver')
+    driver_path = os.path.join(project_path, 'utils', 'chromedriver_win32_2', 'geckodriver.exe')
     os.chmod(driver_path, stat.S_IRWXO+stat.S_IRWXG+stat.S_IRWXU)
     driver = webdriver.Firefox(options=options, executable_path=driver_path)
     driver.get('https://a.dmall.com/act/L76rkBq0UhGOyuV.html?nopos=0&tpc=a_202662')
@@ -265,32 +266,41 @@ def get_account_signin_reward(cookies):
         'Sec-Fetch-Site': 'same-site',
         'Sec-Fetch-Mode': 'cors',
         'Sec-Fetch-Dest': 'empty',
-        'Referer': 'https://a.dmall.com/',
+        'Referer': 'https://a.dmall.com/act/L76rkBq0UhGOyuV.html?nopos=0&tpc=a_202662',
         'Accept-Encoding': 'gzip, deflate, br',
         'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,es;q=0.7,ru;q=0.6,it;q=0.5,nl;q=0.4,fr;q=0.3,de;q=0.2,ko;q=0.1,ja;q=0.1',
     }
     data1 = {
-        'taskId': 'C3gCwBMt6ZDjPTR0oA',
-        'rewardItemId': '81431',
+        'taskId': 'C3gCeTSBdTZlR_KlIw',
+        'rewardItemId': '86113',
         'env': env,
         'd_track_data': d_track_data
     }
     data2 = {
-        'taskId': 'C3gCwGNxQ6obyLwQNQ',
-        'rewardItemId': '81431',
+        'taskId': 'C359bxUMKKq4ffhgAw',
+        'rewardItemId': '86114',
+        'env': env,
+        'd_track_data': d_track_data
+    }
+    data3 = {
+        'taskId': 'C35_r_wQCCphCP4xTA',
+        'rewardItemId': '86115',
         'env': env,
         'd_track_data': d_track_data
     }
     try:
         response1 = requests.post('https://pandoragw.dmall.com/alps/pickup', headers=headers, data=urlencode(data1), cookies=cookies, verify=False)
         response2 = requests.post('https://pandoragw.dmall.com/alps/pickup', headers=headers, data=urlencode(data2), cookies=cookies, verify=False)
+        response3 = requests.post('https://pandoragw.dmall.com/alps/pickup', headers=headers, data=urlencode(data3), cookies=cookies, verify=False)
     except:
         print("网络请求异常,do_task_type2")
         return
     result1 = response1.json()
     result2 = response2.json()
+    result3 = response2.json()
     print(result1)
     print(result2)
+    print(result3)
 
 
 def run():
@@ -299,12 +309,12 @@ def run():
         print(f">>>>>>>【账号开始{k+1}】\n")
         cookies = str2dict(v)
 
-        get_invite_code(cookies)
+        # get_invite_code(cookies)
         do_signin(cookies)
         get_signin_info(cookies)
 
         # 获取连续签到7天和11天奖励
-        # get_account_signin_reward(cookies)
+        get_account_signin_reward(cookies)
 
         summary_table[f"账号{k+1}"] = {
             '本月已连续签到': currentMonthContinuousDays,

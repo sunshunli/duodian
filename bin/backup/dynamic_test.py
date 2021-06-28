@@ -22,7 +22,7 @@ from utils.tools import get_target_value, str2dict, serverJ
 cookiesList = get_cookies()
 
 # 读取配置文件
-cfgpath = os.path.join(curpath, '../conf', 'config.ini')
+cfgpath = os.path.join(curpath, '../../conf', 'config.ini')
 # 创建管理对象
 conf = configparser.ConfigParser()
 # 读ini文件
