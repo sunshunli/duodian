@@ -309,7 +309,7 @@ def run():
         print(f">>>>>>>【账号开始{k+1}】\n")
         cookies = str2dict(v)
 
-        # get_invite_code(cookies)
+        get_invite_code(cookies)
         do_signin(cookies)
         get_signin_info(cookies)
 
