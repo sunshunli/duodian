@@ -20,7 +20,7 @@ jobs:
       - name: 'Install requirements'
         run: pip install -r ./requirements.txt 
         
-      - name: 'run 多点签到'
+      - name: 'run 多点答题'
         run: python3 bin/dd_answer.py
         env:
             DD_GARDEN_COOKIE: ${{ secrets.DD_GARDEN_COOKIE }}  #必须
