@@ -39,6 +39,49 @@ assistCode = conf['AssistCode']['code']
 coin = 0
 totalCoin = 0
 summary_table = {}
+activity_code = '023b1c1c'
+activity_prizeId = '6271'
+
+
+def get_activity_code(cookies):
+    """
+    获取答题活动的id
+    """
+    global activity_code
+    headers = {
+        'Host': 'farm.dmall.com',
+        'Connection': 'keep-alive',
+        'Pragma': 'no-cache',
+        'Cache-Control': 'no-cache',
+        'User-Agent': UserAgent,
+        'Accept': '*/*',
+        'Referer': 'https://act.dmall.com/dac/mygarden/index.html?dmfrom=wx&dmTransStatusBar=true&dmShowTitleBar=false&bounces=false&dmNeedLogin=true',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language': 'zh-CN,en-US;q=0.8',
+        'X-Requested-With': 'com.wm.dmall'
+    }
+    params = {
+        'callback': 'jQuery35109245784105782566_1625203096510',
+        'lastUserMessageId': '',
+        'lastSysMessageId': '',
+        'token': cookies['token'],
+        'ticketName': cookies['ticketName'],
+        'vendorId': '1',
+        'storeId': cookies['storeId']
+    }
+    try:
+        response = requests.get('https://farm.dmall.com/user/login', headers=headers, params=params, cookies=cookies, verify=False)
+    except Exception as e:
+        print(e)
+        return
+    nPos = response.text.index('(') + 1
+    response = response.text[nPos:-2]
+    data = json.loads(response)
+    targetUrl = data.get('data').get('popAdInfo').get('targetUrl')
+    for item in targetUrl.split('?')[1].split('&'):
+        if item.startswith('code'):
+            activity_code = item.split('=')[1]
+
 
 
 def get_more_chance(cookies, code):
@@ -57,7 +100,7 @@ def get_more_chance(cookies, code):
         'X-Requested-With': 'com.wm.dmal'
     }
     params = {
-        'code': '698d1912',
+        'code': activity_code,
         'assistCode': code
     }
     try:
@@ -87,7 +130,7 @@ def get_questions(cookies):
         'X-Requested-With': 'com.wm.dmal'
     }
     params = {
-        'code': '698d1912'
+        'code': activity_code
     }
     try:
         response = requests.get(
@@ -127,7 +170,7 @@ def answer_questions(cookies, token, ids):
         'X-Requested-With': 'com.wm.dmal'
     }
     params = {
-        'code': '698d1912',
+        'code': activity_code,
         'token': token,
         'answers': ids
     }
@@ -159,8 +202,8 @@ def get_reward_water(cookies):
         'X-Requested-With': 'com.wm.dmal'
     }
     params = {
-        'code': '698d1912',
-        'activityPrizeId': '6173'
+        'code': activity_code,
+        'activityPrizeId': activity_prizeId
     }
     try:
         response = requests.get(
@@ -190,7 +233,7 @@ def get_prize_list(cookies):
         'X-Requested-With': 'com.wm.dmal'
     }
     params = {
-        'code': '698d1912'
+        'code': activity_code
     }
     try:
         response = requests.get(
@@ -220,6 +263,8 @@ def run():
     for k, v in enumerate(cookiesList):
         print(f">>>>>>>【账号开始{k+1}】\n")
         cookies = str2dict(v)
+        # 前提条件，必须先执行获取答题活动code
+        get_activity_code(cookies)
 
         # 获取答题机会
         for v in assistCode.rstrip('&').split('&'):

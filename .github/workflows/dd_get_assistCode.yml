@@ -1,8 +1,8 @@
-name: 多点签到
+name: 获取回答问题助力码
 
 on:
   schedule:
-    - cron: '0 17 * * *'
+    - cron: '0 16 * * *'
   watch:
     types: [started]
 jobs:
@@ -21,7 +21,7 @@ jobs:
         run: pip install -r ./requirements.txt 
         
       - name: 'run 多点签到'
-        run: python3 bin/dd_sign.py
+        run: python3 bin/dd_get_assistCode.py
         env:
             DD_GARDEN_COOKIE: ${{ secrets.DD_GARDEN_COOKIE }}  #必须
             BARK: ${{ secrets.BARK }}     # bark服务

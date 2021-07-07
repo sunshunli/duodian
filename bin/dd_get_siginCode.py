@@ -5,7 +5,7 @@
 多点自动获取答题share code脚本
 每日早上0点执行领取水滴奖励任务
 """
-
+import json
 import sys
 import requests
 import time
@@ -38,44 +38,48 @@ def get_own_sharecode(cookies):
     # 获取分享code
     global assist_code
     headers = {
-        'Host': 'mario-api.dmall.com',
-        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'Host': 'appapis.dmall.com',
+        'Connection': 'keep-alive',
         'Pragma': 'no-cache',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-        'Origin': 'https://act.dmall.com',
         'User-Agent': UserAgent,
-        'Accept-Language': 'zh-CN,en-US;q=0.8',
-        'Referer': 'https://act.dmall.com/dac/mario_h5/index.html?dmShowShare=false&bounces=false&dmShowCart=false&dmfrom=wx&code=698d1912',
+        'Accept': '*/*',
+        'Referer': 'https://act.dmall.com/dac/signIn/index.html?dmShowTitleBar=false&dmfrom=wx&bounces=false&dmTransStatusBar=true&tdc=26.21.0.36081-37852-52340024-52315293.259200000&dmNeedLogin=true',
         'Accept-Encoding': 'gzip, deflate',
-        'X-Requested-With': 'com.wm.dmal'
+        'Accept-Language': 'zh-CN,en-US;q=0.8',
+        'X-Requested-With': 'com.wm.dmall'
     }
     params = {
-        'code': '023b1c1c',
-        'assistCode': ''
+        'callback': 'jQuery223022011260293271162_1625045888680',
+        'actId': '57',
+        'linkUrl': 'https%3A%2F%2Fi.dmall.com%2Fkayak-project%2Fmpactivities%2Fhtml%2Finvite%2Finvite2.html',
+        '_': '1625045888683'
     }
     try:
         response = requests.get(
-            'https://mario-api.dmall.com/activity/info', headers=headers, params=params, cookies=cookies,
+            'https://appapis.dmall.com/static/generateInviteCode.jsonp',
+            headers=headers, params=params, cookies=cookies,
             verify=False)
     except:
-        print("网络请求异常,get_questions")
+        print("网络请求异常,get_own_sharecode")
         return
-    data = response.json()
-    assist_code += data.get('data').get('userCode') + '&'
-    print(assist_code)
+    nPos = response.text.index('(') + 1
+    response = response.text[nPos:-1].replace("'", '"')
+    data = json.loads(response)
+    assist_code += data.get("result").get("data") + '&'
+    # print(assist_code)
 
 
 def run():
-    print(f"开始获取答题share code执行脚本", time.strftime('%Y-%m-%d %H:%M:%S'))
+    print(f"开始获取签到助力share code执行脚本", time.strftime('%Y-%m-%d %H:%M:%S'))
     for k, v in enumerate(cookiesList):
         print(f">>>>>>>【账号开始{k+1}】\n")
         cookies = str2dict(v)
         get_own_sharecode(cookies)
 
     # 将获取每人的sharecode统一写入配置文件
-    # conf.add_section("AssistCode")
-    conf.set("AssistCode", "code", str(assist_code))
+    # conf.add_section("signCode")
+    conf.set("signCode", "code", str(assist_code))
     # 写入配置文件
     with open(cfgpath, "w+") as f:
         conf.write(f)

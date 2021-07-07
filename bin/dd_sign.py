@@ -46,6 +46,7 @@ conf.read(cfgpath, encoding="utf-8")
 # 读取配置文件中的User Agent
 UserAgent = conf['user_agent']['garden_ua']
 cookiesList = get_cookies()
+assistCode = conf['signCode']['code']
 ###################################################
 currentMonthContinuousDays = ''
 currentMonthAddUpDays = ''
@@ -230,7 +231,7 @@ def get_account_signin_reward(cookies):
     options.add_argument(f'user-agent={UserAgent}')
 
     project_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-    driver_path = os.path.join(project_path, 'utils', 'chromedriver_win32_2', 'geckodriver')
+    driver_path = os.path.join(project_path, 'utils', 'chromedriver_win32_2', 'geckodriver.exe')
     os.chmod(driver_path, stat.S_IRWXO+stat.S_IRWXG+stat.S_IRWXU)
     driver = webdriver.Firefox(options=options, executable_path=driver_path)
     driver.get('https://a.dmall.com/act/L76rkBq0UhGOyuV.html?nopos=0&tpc=a_202662')
@@ -303,6 +304,115 @@ def get_account_signin_reward(cookies):
     print(result3)
 
 
+def do_assistant(cookies, inviteCode, ticketName, token):
+    """
+    签到助力
+    """
+    headers = {
+        'Host': 'appapis.dmall.com',
+        'Connection': 'keep-alive',
+        'Pragma': 'no-cache',
+        'Cache-Control': 'no-cache',
+        'User-Agent': UserAgent,
+        'Accept': '*/*',
+        'Referer': 'https://i.dmall.com/kayak-project/mpactivities/html/invite/invite2.html?inviteCode=tv4bfAAh&tdc=26.21.0.36081-37852-52340024-52315293.259200000&cookie=%7B%22token%22%3A%22c8587e40-2913-4951-9e28-1c001e691a4e%22%2C%22ticketName%22%3A%224040F4DEB3424DD69B5F9C3FDE387A2CA2707868DCCA510CEFBEC74756823E169AB54715A91C1EA35CAEFF9E2A35BE7CAA109C172735900F282859301CA4F0B0EDEEF4D1ACA8A8662B41374F58A4B57A3DD48F334A048024AE8E429B3D0378794B7B943ABE28765D693C09FA3C7310DCF3B2EEC5A3249E321DB14C42617DEEB7%22%2C%22ticketLoginId%22%3A%22d96ce6fe-5ed5-48ed-a9de-f9f21d4baa2d%22%2C%22utmSourceId%22%3A%22%22%2C%22userId%22%3A29071278%2C%22platform%22%3A%22miniprogram%22%2C%22uuid%22%3A%22C96632F343D000026F701C0016F0CEE01623405465662%22%2C%22GPSLatLng%22%3A%22undefined%2Cundefined%22%2C%22pos_get_time%22%3Anull%2C%22openId%22%3A%22oO2Dq0JQ_iCXLx4ZEpU9UqUTK9HA%22%2C%22st%22%3A1623405465959%2C%22sc%22%3A1%2C%22et%22%3A1625043779213%2C%22project%22%3A%22%E4%B8%BB%E5%B0%8F%E7%A8%8B%E5%BA%8F%22%2C%22wxaCurStores%22%3A%22%22%2C%22addHitStore%22%3A%22%22%2C%22address%22%3A%22%22%2C%22latlng%22%3A%22%22%2C%22areaName%22%3A%22undefined%22%2C%22trackProject%22%3A%22%E4%B8%BB%E5%B0%8F%E7%A8%8B%E5%BA%8F%22%2C%22storeGroup%22%3A%22%22%2C%22theme%22%3A%7B%22mainColor%22%3A%22rgba(255%2C104%2C10%2C1)%22%2C%22secondColor%22%3A%22rgba(255%2C104%2C10%2C1)%22%2C%22iconColor%22%3A%22rgba(255%2C104%2C10%2C1)%22%2C%22graColor%22%3A%22rgba(255%2C138%2C0%2C1)%22%7D%2C%22wxAddrId%22%3A%22%22%2C%22dmTenantId%22%3A%221%22%2C%22source%22%3A%229%22%7D&t=1625043779945',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+        'X-Requested-With': 'com.tencent.mm',
+        'Sec-Fetch-Site': 'same-site',
+        'Sec-Fetch-Mode': 'no-cors'
+    }
+    params = {
+        'inviteCode': inviteCode,
+        'token': token,
+        'ticketName': ticketName
+    }
+    try:
+        response = requests.get(
+            'https://appapis.dmall.com/static/sendKey.jsonp',
+            headers=headers, params=params, cookies=cookies,
+            verify=False)
+    except:
+        print("网络请求异常,get_own_sharecode")
+        return
+    print(response.text)
+
+
+def get_assistant_status(cookies):
+    """
+    获取助力信息
+    """
+    headers = {
+        'Host': 'appapis.dmall.com',
+        'Connection': 'keep-alive',
+        'Pragma': 'no-cache',
+        'Cache-Control': 'no-cache',
+        'User-Agent': UserAgent,
+        'Accept': '*/*',
+        'Referer': 'https://i.dmall.com/kayak-project/mpactivities/html/invite/invite2.html?inviteCode=tv4bfAAh&tdc=26.21.0.36081-37852-52340024-52315293.259200000&cookie=%7B%22token%22%3A%22c8587e40-2913-4951-9e28-1c001e691a4e%22%2C%22ticketName%22%3A%224040F4DEB3424DD69B5F9C3FDE387A2CA2707868DCCA510CEFBEC74756823E169AB54715A91C1EA35CAEFF9E2A35BE7CAA109C172735900F282859301CA4F0B0EDEEF4D1ACA8A8662B41374F58A4B57A3DD48F334A048024AE8E429B3D0378794B7B943ABE28765D693C09FA3C7310DCF3B2EEC5A3249E321DB14C42617DEEB7%22%2C%22ticketLoginId%22%3A%22d96ce6fe-5ed5-48ed-a9de-f9f21d4baa2d%22%2C%22utmSourceId%22%3A%22%22%2C%22userId%22%3A29071278%2C%22platform%22%3A%22miniprogram%22%2C%22uuid%22%3A%22C96632F343D000026F701C0016F0CEE01623405465662%22%2C%22GPSLatLng%22%3A%22undefined%2Cundefined%22%2C%22pos_get_time%22%3Anull%2C%22openId%22%3A%22oO2Dq0JQ_iCXLx4ZEpU9UqUTK9HA%22%2C%22st%22%3A1623405465959%2C%22sc%22%3A1%2C%22et%22%3A1625043779213%2C%22project%22%3A%22%E4%B8%BB%E5%B0%8F%E7%A8%8B%E5%BA%8F%22%2C%22wxaCurStores%22%3A%22%22%2C%22addHitStore%22%3A%22%22%2C%22address%22%3A%22%22%2C%22latlng%22%3A%22%22%2C%22areaName%22%3A%22undefined%22%2C%22trackProject%22%3A%22%E4%B8%BB%E5%B0%8F%E7%A8%8B%E5%BA%8F%22%2C%22storeGroup%22%3A%22%22%2C%22theme%22%3A%7B%22mainColor%22%3A%22rgba(255%2C104%2C10%2C1)%22%2C%22secondColor%22%3A%22rgba(255%2C104%2C10%2C1)%22%2C%22iconColor%22%3A%22rgba(255%2C104%2C10%2C1)%22%2C%22graColor%22%3A%22rgba(255%2C138%2C0%2C1)%22%7D%2C%22wxAddrId%22%3A%22%22%2C%22dmTenantId%22%3A%221%22%2C%22source%22%3A%229%22%7D&t=1625043779945',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+        'X-Requested-With': 'com.tencent.mm',
+        'Sec-Fetch-Site': 'same-site',
+        'Sec-Fetch-Mode': 'no-cors'
+    }
+    params = {
+        'callback': 'jQuery223022011260293271162_1625045888680'
+    }
+    try:
+        response = requests.get(
+            'https://appapis.dmall.com/static/queryInviteAct.jsonp',
+            headers=headers, params=params, cookies=cookies,
+            verify=False)
+    except:
+        print("网络请求异常,get_own_sharecode")
+        return
+    nPos = response.text.index('(') + 1
+    response = response.text[nPos:-1].replace("'", '"')
+    data = json.loads(response)
+    key_count = data.get("result").get('data').get('inviteBox').get('keyCount')
+    invite_result_arr = data.get("result").get('data').get('inviteBox').get('boxes')
+    for index in range(key_count):
+        # 获取奖励
+        get_assistant_reward(cookies, index)
+
+
+def get_assistant_reward(cookies, index):
+    """
+    获取助力奖励
+    """
+    headers = {
+        'Host': 'appapis.dmall.com',
+        'Connection': 'keep-alive',
+        'Pragma': 'no-cache',
+        'Cache-Control': 'no-cache',
+        'User-Agent': UserAgent,
+        'Accept': '*/*',
+        'Referer': 'https://i.dmall.com/kayak-project/mpactivities/html/invite/invite2.html?inviteCode=tv4bfAAh&tdc=26.21.0.36081-37852-52340024-52315293.259200000&cookie=%7B%22token%22%3A%22c8587e40-2913-4951-9e28-1c001e691a4e%22%2C%22ticketName%22%3A%224040F4DEB3424DD69B5F9C3FDE387A2CA2707868DCCA510CEFBEC74756823E169AB54715A91C1EA35CAEFF9E2A35BE7CAA109C172735900F282859301CA4F0B0EDEEF4D1ACA8A8662B41374F58A4B57A3DD48F334A048024AE8E429B3D0378794B7B943ABE28765D693C09FA3C7310DCF3B2EEC5A3249E321DB14C42617DEEB7%22%2C%22ticketLoginId%22%3A%22d96ce6fe-5ed5-48ed-a9de-f9f21d4baa2d%22%2C%22utmSourceId%22%3A%22%22%2C%22userId%22%3A29071278%2C%22platform%22%3A%22miniprogram%22%2C%22uuid%22%3A%22C96632F343D000026F701C0016F0CEE01623405465662%22%2C%22GPSLatLng%22%3A%22undefined%2Cundefined%22%2C%22pos_get_time%22%3Anull%2C%22openId%22%3A%22oO2Dq0JQ_iCXLx4ZEpU9UqUTK9HA%22%2C%22st%22%3A1623405465959%2C%22sc%22%3A1%2C%22et%22%3A1625043779213%2C%22project%22%3A%22%E4%B8%BB%E5%B0%8F%E7%A8%8B%E5%BA%8F%22%2C%22wxaCurStores%22%3A%22%22%2C%22addHitStore%22%3A%22%22%2C%22address%22%3A%22%22%2C%22latlng%22%3A%22%22%2C%22areaName%22%3A%22undefined%22%2C%22trackProject%22%3A%22%E4%B8%BB%E5%B0%8F%E7%A8%8B%E5%BA%8F%22%2C%22storeGroup%22%3A%22%22%2C%22theme%22%3A%7B%22mainColor%22%3A%22rgba(255%2C104%2C10%2C1)%22%2C%22secondColor%22%3A%22rgba(255%2C104%2C10%2C1)%22%2C%22iconColor%22%3A%22rgba(255%2C104%2C10%2C1)%22%2C%22graColor%22%3A%22rgba(255%2C138%2C0%2C1)%22%7D%2C%22wxAddrId%22%3A%22%22%2C%22dmTenantId%22%3A%221%22%2C%22source%22%3A%229%22%7D&t=1625043779945',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+        'X-Requested-With': 'com.tencent.mm',
+        'Sec-Fetch-Site': 'same-site',
+        'Sec-Fetch-Mode': 'no-cors'
+    }
+    params = {
+        'callback': 'jQuery223022011260293271162_1625045888680',
+        'index': index
+    }
+    try:
+        response = requests.get(
+            'https://appapis.dmall.com//static/openBox.jsonp',
+            headers=headers, params=params, cookies=cookies,
+            verify=False)
+    except:
+        print("网络请求异常,get_own_sharecode")
+        return
+    nPos = response.text.index('(') + 1
+    response = response.text[nPos:-1].replace("'", '"')
+    data = json.loads(response)
+    print(data)
+
+
 def run():
     print(f"开始运行多点果园签到脚本", time.strftime('%Y-%m-%d %H:%M:%S'))
     for k, v in enumerate(cookiesList):
@@ -313,8 +423,15 @@ def run():
         do_signin(cookies)
         get_signin_info(cookies)
 
+        # 助力
+        token = cookies.get("token")
+        ticket_name = cookies.get("token")
+        for v in assistCode.rstrip('&').split('&'):
+            time.sleep(2)
+            do_assistant(cookies, v, ticket_name, token)
+
         # 获取连续签到7天和11天奖励
-        get_account_signin_reward(cookies)
+        # get_account_signin_reward(cookies)
 
         summary_table[f"账号{k+1}"] = {
             '本月已连续签到': currentMonthContinuousDays,
@@ -322,6 +439,11 @@ def run():
             '今日签到': hasCheckIn,
             '当前多点金币': score
         }
+
+    for k, v in enumerate(cookiesList):
+        print(f">>>>>>>【账号开始{k+1}】\n")
+        cookies = str2dict(v)
+        get_assistant_status(cookies)
 
     summary_info()
 
