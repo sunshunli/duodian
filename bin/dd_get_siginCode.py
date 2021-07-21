@@ -70,7 +70,7 @@ def get_own_sharecode(cookies):
     # print(assist_code)
 
 
-def run():
+def get_all_signcode():
     print(f"开始获取签到助力share code执行脚本", time.strftime('%Y-%m-%d %H:%M:%S'))
     for k, v in enumerate(cookiesList):
         print(f">>>>>>>【账号开始{k+1}】\n")
@@ -79,11 +79,12 @@ def run():
 
     # 将获取每人的sharecode统一写入配置文件
     # conf.add_section("signCode")
-    conf.set("signCode", "code", str(assist_code))
+    # conf.set("signCode", "code", str(assist_code))
     # 写入配置文件
-    with open(cfgpath, "w+") as f:
-        conf.write(f)
+    # with open(cfgpath, "w+") as f:
+    #     conf.write(f)
+    return assist_code
 
 
 if __name__ == "__main__":
-    run()
+    get_all_signcode()

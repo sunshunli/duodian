@@ -381,7 +381,7 @@ def do_plant(cookies):
     }
     params = {
         'landId': '1',
-        'cropId': '143',
+        'cropId': '151',
         'token': cookies['token'],
         'ticketName': cookies['ticketName'],
         'vendorId': '1',

@@ -23,6 +23,8 @@ sys.path.append(base_path)
 from utils.dd_cookies import get_cookies
 from utils.tools import get_target_value, str2dict, serverJ
 
+from dd_get_siginCode import get_all_signcode
+
 
 ###################################################
 # GitHub action运行需要填写对应的secrets
@@ -46,8 +48,9 @@ conf.read(cfgpath, encoding="utf-8")
 # 读取配置文件中的User Agent
 UserAgent = conf['user_agent']['garden_ua']
 cookiesList = get_cookies()
-assistCode = conf['signCode']['code']
+# assistCode = conf['signCode']['code']
 ###################################################
+assistCode = ''
 currentMonthContinuousDays = ''
 currentMonthAddUpDays = ''
 hasCheckIn = ''
@@ -415,6 +418,9 @@ def get_assistant_reward(cookies, index):
 
 def run():
     print(f"开始运行多点果园签到脚本", time.strftime('%Y-%m-%d %H:%M:%S'))
+    # 获取助力码
+    global  assistCode
+    assistCode = get_all_signcode()
     for k, v in enumerate(cookiesList):
         print(f">>>>>>>【账号开始{k+1}】\n")
         cookies = str2dict(v)
