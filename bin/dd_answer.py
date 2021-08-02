@@ -39,9 +39,9 @@ assistCode = conf['AssistCode']['code']
 coin = 0
 totalCoin = 0
 summary_table = {}
-activity_code = '023b1c1c'
-activity_prizeId = '6271'
-
+activity_code = '5d8a4213'
+activity_prizeId = '6315'
+# https://mario-api.dmall.com/activity/info?code=5d8a4213&assistCode=&_=1627868775788 查看activity_code
 
 def get_activity_code(cookies):
     """

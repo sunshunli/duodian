@@ -51,7 +51,7 @@ def get_own_sharecode(cookies):
     }
     params = {
         'callback': 'jQuery223022011260293271162_1625045888680',
-        'actId': '57',
+        'actId': '60',
         'linkUrl': 'https%3A%2F%2Fi.dmall.com%2Fkayak-project%2Fmpactivities%2Fhtml%2Finvite%2Finvite2.html',
         '_': '1625045888683'
     }
