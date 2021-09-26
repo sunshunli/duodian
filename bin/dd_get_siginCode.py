@@ -38,35 +38,34 @@ def get_own_sharecode(cookies):
     # 获取分享code
     global assist_code
     headers = {
-        'Host': 'appapis.dmall.com',
+        'Host': 'sign-in.dmall.com',
         'Connection': 'keep-alive',
         'Pragma': 'no-cache',
         'Cache-Control': 'no-cache',
         'User-Agent': UserAgent,
-        'Accept': '*/*',
-        'Referer': 'https://act.dmall.com/dac/signIn/index.html?dmShowTitleBar=false&dmfrom=wx&bounces=false&dmTransStatusBar=true&tdc=26.21.0.36081-37852-52340024-52315293.259200000&dmNeedLogin=true',
+        'Accept': 'application/json, text/plain, */*',
+        'Origin': 'https://appsign-in.dmall.com',
+        'Referer': 'https://appsign-in.dmall.com/?dmNeedLogin=true&dmfrom=wx&dmTransStatusBar=true&dmShowTitleBar=false&bounces=false&dmTransStatusBar=true&dmShowTitleBar=false&bounces=false&dmNeedLogin=true',
         'Accept-Encoding': 'gzip, deflate',
         'Accept-Language': 'zh-CN,en-US;q=0.8',
-        'X-Requested-With': 'com.wm.dmall'
+        'X-Requested-With': 'com.wm.dmall',
+        'Cookie': cookies
     }
-    params = {
-        'callback': 'jQuery223022011260293271162_1625045888680',
-        'actId': '60',
-        'linkUrl': 'https%3A%2F%2Fi.dmall.com%2Fkayak-project%2Fmpactivities%2Fhtml%2Finvite%2Finvite2.html',
-        '_': '1625045888683'
+
+    data = {
+        'actId': 201
     }
     try:
-        response = requests.get(
-            'https://appapis.dmall.com/static/generateInviteCode.jsonp',
-            headers=headers, params=params, cookies=cookies,
-            verify=False)
-    except:
-        print("网络请求异常,get_own_sharecode")
+        response = requests.post('https://sign-in.dmall.com/generateInviteCode', headers=headers, data=data,
+                                 verify=False)
+    except Exception as e:
+        print(e)
         return
-    nPos = response.text.index('(') + 1
-    response = response.text[nPos:-1].replace("'", '"')
+    response = response.text.lstrip('(').rstrip(')').replace("'", '"')
     data = json.loads(response)
-    assist_code += data.get("result").get("data") + '&'
+    print(data)
+
+    assist_code += data.get('data') + '&'
     # print(assist_code)
 
 
@@ -75,7 +74,7 @@ def get_all_signcode():
     for k, v in enumerate(cookiesList):
         print(f">>>>>>>【账号开始{k+1}】\n")
         cookies = str2dict(v)
-        get_own_sharecode(cookies)
+        get_own_sharecode(v)
 
     # 将获取每人的sharecode统一写入配置文件
     # conf.add_section("signCode")

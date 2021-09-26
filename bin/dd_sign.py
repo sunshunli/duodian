@@ -62,125 +62,131 @@ env = ''
 def do_signin(cookies):
     # 签到有礼
     headers = {
-        'Host': 'appapis.dmall.com',
+        'Host': 'sign-in.dmall.com',
         'Connection': 'keep-alive',
         'Pragma': 'no-cache',
         'Cache-Control': 'no-cache',
         'User-Agent': UserAgent,
-        'Accept': '*/*',
-        'Referer': 'https://act.dmall.com/dac/signIn/index.html?dmShowTitleBar=false&dmfrom=wx&bounces=false&dmTransStatusBar=true&dmNeedLogin=true',
+        'Accept': 'application/json, text/plain, */*',
+        'Origin': 'https://appsign-in.dmall.com',
+        'Referer': 'https://appsign-in.dmall.com/?dmNeedLogin=true&dmfrom=wx&dmTransStatusBar=true&dmShowTitleBar=false&bounces=false&dmTransStatusBar=true&dmShowTitleBar=false&bounces=false&dmNeedLogin=true',
         'Accept-Encoding': 'gzip, deflate',
         'Accept-Language': 'zh-CN,en-US;q=0.8',
-        'X-Requested-With': 'com.wm.dmall'
+        'X-Requested-With': 'com.wm.dmall',
+        'Cookie': cookies
     }
-    params = {
-        'isNew': '1',
-        'apiVersion': '5.0.4',
-        'platform': 'Android',
-        'venderId': '1',
-        'storeId': cookies['storeId']
+
+    data = {
+        'tenantId': '1',
+        'platform': 'ANDROID',
+        'vendorId': '1'
     }
     try:
-        response = requests.get('https://appapis.dmall.com/static/signInProccess.jsonp', headers=headers, params=params, cookies=cookies, verify=False)
+        response = requests.post('https://sign-in.dmall.com/checkIn', headers=headers, data=data, verify=False)
     except Exception as e:
         print(e)
         return
     # data = json.loads(response)
-    print('执行签到任务', response.text)
+    result = response.json()
+    print('执行签到任务', result)
 
 
 def get_signin_info(cookies):
     # 获取签到信息
     headers = {
-        'Host': 'appapis.dmall.com',
+        'Host': 'sign-in.dmall.com',
         'Connection': 'keep-alive',
         'Pragma': 'no-cache',
         'Cache-Control': 'no-cache',
         'User-Agent': UserAgent,
-        'Accept': '*/*',
-        'Referer': 'https://act.dmall.com/dac/signIn/index.html?dmShowTitleBar=false&dmfrom=wx&bounces=false&dmTransStatusBar=true&dmNeedLogin=true',
+        'Accept': 'application/json, text/plain, */*',
+        'Origin': 'https://appsign-in.dmall.com',
+        'Referer': 'https://appsign-in.dmall.com/?dmNeedLogin=true&dmfrom=wx&dmTransStatusBar=true&dmShowTitleBar=false&bounces=false&dmTransStatusBar=true&dmShowTitleBar=false&bounces=false&dmNeedLogin=true',
         'Accept-Encoding': 'gzip, deflate',
         'Accept-Language': 'zh-CN,en-US;q=0.8',
-        'X-Requested-With': 'com.wm.dmall'
+        'X-Requested-With': 'com.wm.dmall',
+        'Cookie': cookies
     }
-    params = {
-        'isNew': '1',
-        'apiVersion': '5.0.4',
-        'platform': 'Android',
-        'venderId': '1',
-        'storeId': cookies['storeId']
+
+    data = {
+        'tenantId': '1',
+        'platform': 'ANDROID',
+        'vendorId': '1'
     }
     try:
-        response = requests.get('https://appapis.dmall.com/static/queryUserCheckInfo.jsonp', headers=headers, params=params, cookies=cookies, verify=False)
+        response = requests.post('https://sign-in.dmall.com/checkInQuery', headers=headers, data=data, verify=False)
     except Exception as e:
         print(e)
         return
     response = response.text.lstrip('(').rstrip(')').replace("'", '"')
     data = json.loads(response)
+    print(data)
 
-    # 本月已连续签到天数
-    month_continuous_sign = data.get('result').get('data').get('currentMonthContinuousDays')
-    # 本月已累计签到天数
-    month_add_sign = data.get('result').get('data').get('currentMonthAddUpDays')
-    # 循环遍历连续签到状态，判断是否有可领取奖励
-    month_continuous_progress = data.get('result').get('data').get('currentMonthContinueProgress')
-    for rewardList in month_continuous_progress:
-        # 首先判断奖励是否被领取, False表示未被领取
-        if rewardList['rewardFinished'] == False:
-            # 再判断是否满足领取要求
-            print('连续签到奖励', rewardList['rewards'][0].get('rewardName'))
-            if rewardList['requiredTimes'] == month_continuous_sign:
-                print('领取连续签到奖励', rewardList['rewards'])
-                receive_signin_reward(cookies, rewardList['taskId'])
-    # 循环遍历累计签到状态，判断是否有可领取奖励
-    month_add_progress = data.get('result').get('data').get('currentMonthAddProgress')
-    for rewardAddList in month_add_progress:
-        # 首先判断奖励是否被领取, False表示未被领取
-        if rewardAddList['rewardFinished'] == False:
-            # 再判断是否满足领取要求
-            print('累计签到奖励', rewardAddList['rewards'][0].get('rewardName'))
-            if rewardAddList['requiredTimes'] == month_continuous_sign:
-                print('领取累计签到奖励', rewardAddList['rewards'])
-                receive_signin_reward(cookies, rewardAddList['taskId'])
-
-    global currentMonthContinuousDays
-    global currentMonthAddUpDays
-    global hasCheckIn
-    global score
-
-    currentMonthContinuousDays = data.get('result').get('data').get('currentMonthContinuousDays')
-    currentMonthAddUpDays = data.get('result').get('data').get('currentMonthAddUpDays')
-    hasCheckIn = data.get('result').get('data').get('hasCheckIn')
-    score = data.get('result').get('data').get('score')
-    print('本月已连续签到', data.get('result').get('data').get('currentMonthContinuousDays'))
-    print('本月已累计签到', data.get('result').get('data').get('currentMonthAddUpDays'))
-    print('今日签到状态', data.get('result').get('data').get('hasCheckIn'))
-    print('当前多点金币', data.get('result').get('data').get('score'))
+    # # 本月已连续签到天数
+    # month_continuous_sign = data.get('result').get('data').get('currentMonthContinuousDays')
+    # # 本月已累计签到天数
+    # month_add_sign = data.get('result').get('data').get('currentMonthAddUpDays')
+    # # 循环遍历连续签到状态，判断是否有可领取奖励
+    # month_continuous_progress = data.get('result').get('data').get('currentMonthContinueProgress')
+    # for rewardList in month_continuous_progress:
+    #     # 首先判断奖励是否被领取, False表示未被领取
+    #     if rewardList['rewardFinished'] == False:
+    #         # 再判断是否满足领取要求
+    #         print('连续签到奖励', rewardList['rewards'][0].get('rewardName'))
+    #         if rewardList['requiredTimes'] == month_continuous_sign:
+    #             print('领取连续签到奖励', rewardList['rewards'])
+    #             receive_signin_reward(cookies, rewardList['taskId'])
+    # # 循环遍历累计签到状态，判断是否有可领取奖励
+    # month_add_progress = data.get('result').get('data').get('currentMonthAddProgress')
+    # for rewardAddList in month_add_progress:
+    #     # 首先判断奖励是否被领取, False表示未被领取
+    #     if rewardAddList['rewardFinished'] == False:
+    #         # 再判断是否满足领取要求
+    #         print('累计签到奖励', rewardAddList['rewards'][0].get('rewardName'))
+    #         if rewardAddList['requiredTimes'] == month_continuous_sign:
+    #             print('领取累计签到奖励', rewardAddList['rewards'])
+    #             receive_signin_reward(cookies, rewardAddList['taskId'])
+    #
+    # global currentMonthContinuousDays
+    # global currentMonthAddUpDays
+    # global hasCheckIn
+    # global score
+    #
+    # currentMonthContinuousDays = data.get('result').get('data').get('currentMonthContinuousDays')
+    # currentMonthAddUpDays = data.get('result').get('data').get('currentMonthAddUpDays')
+    # hasCheckIn = data.get('result').get('data').get('hasCheckIn')
+    # score = data.get('result').get('data').get('score')
+    # print('本月已连续签到', data.get('result').get('data').get('currentMonthContinuousDays'))
+    # print('本月已累计签到', data.get('result').get('data').get('currentMonthAddUpDays'))
+    # print('今日签到状态', data.get('result').get('data').get('hasCheckIn'))
+    # print('当前多点金币', data.get('result').get('data').get('score'))
 
 
 def receive_signin_reward(cookies, task_id):
     headers = {
-        'Host': 'appapis.dmall.com',
+        'Host': 'sign-in.dmall.com',
         'Connection': 'keep-alive',
         'Pragma': 'no-cache',
         'Cache-Control': 'no-cache',
         'User-Agent': UserAgent,
-        'Accept': '*/*',
-        'Referer': 'https://act.dmall.com/dac/signIn/index.html?dmShowTitleBar=false&dmfrom=wx&bounces=false&dmTransStatusBar=true&dmNeedLogin=true',
+        'Accept': 'application/json, text/plain, */*',
+        'Origin': 'https://appsign-in.dmall.com',
+        'Referer': 'https://appsign-in.dmall.com/?dmNeedLogin=true&dmfrom=wx&dmTransStatusBar=true&dmShowTitleBar=false&bounces=false&dmTransStatusBar=true&dmShowTitleBar=false&bounces=false&dmNeedLogin=true',
         'Accept-Encoding': 'gzip, deflate',
         'Accept-Language': 'zh-CN,en-US;q=0.8',
-        'X-Requested-With': 'com.wm.dmall'
+        'X-Requested-With': 'com.wm.dmall',
+        'Cookie': cookies
     }
-    params = {
-        'taskId': task_id,
-        'isNew': '1'
+
+    data = {
+        'actId': 201
     }
-    print(params)
     try:
-        response = requests.get('https://appapis.dmall.com/static/receiveReward.jsonp', headers=headers, params=params, cookies=cookies, verify=False)
+        response = requests.post('https://sign-in.dmall.com/generateInviteCode', headers=headers, data=data, verify=False)
     except Exception as e:
         print(e)
         return
+    print(response)
     response = response.text.lstrip('(').rstrip(')').replace("'", '"')
     data = json.loads(response)
     print(data)
@@ -193,7 +199,7 @@ def summary_info():
 
 
 def get_invite_code(cookies):
-    # 获取签到信息
+    # 获取邀请code
     headers = {
         'Host': 'appapis.dmall.com',
         'Connection': 'keep-alive',
@@ -307,38 +313,33 @@ def get_account_signin_reward(cookies):
     print(result3)
 
 
-def do_assistant(cookies, inviteCode, ticketName, token):
+def do_assistant(cookies, inviteCode):
     """
     签到助力
     """
     headers = {
-        'Host': 'appapis.dmall.com',
+        'Host': 'sign-in.dmall.com',
         'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
         'Pragma': 'no-cache',
         'Cache-Control': 'no-cache',
-        'User-Agent': UserAgent,
-        'Accept': '*/*',
-        'Referer': 'https://i.dmall.com/kayak-project/mpactivities/html/invite/invite2.html?inviteCode=tv4bfAAh&tdc=26.21.0.36081-37852-52340024-52315293.259200000&cookie=%7B%22token%22%3A%22c8587e40-2913-4951-9e28-1c001e691a4e%22%2C%22ticketName%22%3A%224040F4DEB3424DD69B5F9C3FDE387A2CA2707868DCCA510CEFBEC74756823E169AB54715A91C1EA35CAEFF9E2A35BE7CAA109C172735900F282859301CA4F0B0EDEEF4D1ACA8A8662B41374F58A4B57A3DD48F334A048024AE8E429B3D0378794B7B943ABE28765D693C09FA3C7310DCF3B2EEC5A3249E321DB14C42617DEEB7%22%2C%22ticketLoginId%22%3A%22d96ce6fe-5ed5-48ed-a9de-f9f21d4baa2d%22%2C%22utmSourceId%22%3A%22%22%2C%22userId%22%3A29071278%2C%22platform%22%3A%22miniprogram%22%2C%22uuid%22%3A%22C96632F343D000026F701C0016F0CEE01623405465662%22%2C%22GPSLatLng%22%3A%22undefined%2Cundefined%22%2C%22pos_get_time%22%3Anull%2C%22openId%22%3A%22oO2Dq0JQ_iCXLx4ZEpU9UqUTK9HA%22%2C%22st%22%3A1623405465959%2C%22sc%22%3A1%2C%22et%22%3A1625043779213%2C%22project%22%3A%22%E4%B8%BB%E5%B0%8F%E7%A8%8B%E5%BA%8F%22%2C%22wxaCurStores%22%3A%22%22%2C%22addHitStore%22%3A%22%22%2C%22address%22%3A%22%22%2C%22latlng%22%3A%22%22%2C%22areaName%22%3A%22undefined%22%2C%22trackProject%22%3A%22%E4%B8%BB%E5%B0%8F%E7%A8%8B%E5%BA%8F%22%2C%22storeGroup%22%3A%22%22%2C%22theme%22%3A%7B%22mainColor%22%3A%22rgba(255%2C104%2C10%2C1)%22%2C%22secondColor%22%3A%22rgba(255%2C104%2C10%2C1)%22%2C%22iconColor%22%3A%22rgba(255%2C104%2C10%2C1)%22%2C%22graColor%22%3A%22rgba(255%2C138%2C0%2C1)%22%7D%2C%22wxAddrId%22%3A%22%22%2C%22dmTenantId%22%3A%221%22%2C%22source%22%3A%229%22%7D&t=1625043779945',
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 10; LYA-AL00 Build/HUAWEILYA-AL00; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/86.0.4240.99 XWEB/3133 MMWEBSDK/20210601 Mobile Safari/537.36 MMWEBID/2069 MicroMessenger/8.0.11.1980(0x28000B59) Process/appbrand0 WeChat/arm64 Weixin NetType/WIFI Language/zh_CN ABI/arm64 miniProgram',
+        'Accept': 'application/json, text/plain, */*',
         'Accept-Encoding': 'gzip, deflate',
         'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
         'X-Requested-With': 'com.tencent.mm',
-        'Sec-Fetch-Site': 'same-site',
-        'Sec-Fetch-Mode': 'no-cors'
+        'Cookie': cookies,
+        'Origin': 'https://appsign-in.dmall.com',
+        'Content-Type': 'application/x-www-form-urlencoded'
     }
-    params = {
-        'inviteCode': inviteCode,
-        'token': token,
-        'ticketName': ticketName
+    data = {
+        'inviteCode': inviteCode
     }
     try:
-        response = requests.get(
-            'https://appapis.dmall.com/static/sendKey.jsonp',
-            headers=headers, params=params, cookies=cookies,
-            verify=False)
+        response = requests.post('https://sign-in.dmall.com/sendKey', headers=headers, data=data, verify=False)
     except:
         print("网络请求异常,get_own_sharecode")
         return
-    print(response.text)
 
 
 def get_assistant_status(cookies):
@@ -346,38 +347,41 @@ def get_assistant_status(cookies):
     获取助力信息
     """
     headers = {
-        'Host': 'appapis.dmall.com',
+        'Host': 'sign-in.dmall.com',
         'Connection': 'keep-alive',
         'Pragma': 'no-cache',
         'Cache-Control': 'no-cache',
         'User-Agent': UserAgent,
-        'Accept': '*/*',
-        'Referer': 'https://i.dmall.com/kayak-project/mpactivities/html/invite/invite2.html?inviteCode=tv4bfAAh&tdc=26.21.0.36081-37852-52340024-52315293.259200000&cookie=%7B%22token%22%3A%22c8587e40-2913-4951-9e28-1c001e691a4e%22%2C%22ticketName%22%3A%224040F4DEB3424DD69B5F9C3FDE387A2CA2707868DCCA510CEFBEC74756823E169AB54715A91C1EA35CAEFF9E2A35BE7CAA109C172735900F282859301CA4F0B0EDEEF4D1ACA8A8662B41374F58A4B57A3DD48F334A048024AE8E429B3D0378794B7B943ABE28765D693C09FA3C7310DCF3B2EEC5A3249E321DB14C42617DEEB7%22%2C%22ticketLoginId%22%3A%22d96ce6fe-5ed5-48ed-a9de-f9f21d4baa2d%22%2C%22utmSourceId%22%3A%22%22%2C%22userId%22%3A29071278%2C%22platform%22%3A%22miniprogram%22%2C%22uuid%22%3A%22C96632F343D000026F701C0016F0CEE01623405465662%22%2C%22GPSLatLng%22%3A%22undefined%2Cundefined%22%2C%22pos_get_time%22%3Anull%2C%22openId%22%3A%22oO2Dq0JQ_iCXLx4ZEpU9UqUTK9HA%22%2C%22st%22%3A1623405465959%2C%22sc%22%3A1%2C%22et%22%3A1625043779213%2C%22project%22%3A%22%E4%B8%BB%E5%B0%8F%E7%A8%8B%E5%BA%8F%22%2C%22wxaCurStores%22%3A%22%22%2C%22addHitStore%22%3A%22%22%2C%22address%22%3A%22%22%2C%22latlng%22%3A%22%22%2C%22areaName%22%3A%22undefined%22%2C%22trackProject%22%3A%22%E4%B8%BB%E5%B0%8F%E7%A8%8B%E5%BA%8F%22%2C%22storeGroup%22%3A%22%22%2C%22theme%22%3A%7B%22mainColor%22%3A%22rgba(255%2C104%2C10%2C1)%22%2C%22secondColor%22%3A%22rgba(255%2C104%2C10%2C1)%22%2C%22iconColor%22%3A%22rgba(255%2C104%2C10%2C1)%22%2C%22graColor%22%3A%22rgba(255%2C138%2C0%2C1)%22%7D%2C%22wxAddrId%22%3A%22%22%2C%22dmTenantId%22%3A%221%22%2C%22source%22%3A%229%22%7D&t=1625043779945',
+        'Accept': 'application/json, text/plain, */*',
+        'Origin': 'https://appsign-in.dmall.com',
+        'Referer': 'https://appsign-in.dmall.com/?dmNeedLogin=true&dmfrom=wx&dmTransStatusBar=true&dmShowTitleBar=false&bounces=false&dmTransStatusBar=true&dmShowTitleBar=false&bounces=false&dmNeedLogin=true',
         'Accept-Encoding': 'gzip, deflate',
-        'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
-        'X-Requested-With': 'com.tencent.mm',
-        'Sec-Fetch-Site': 'same-site',
-        'Sec-Fetch-Mode': 'no-cors'
+        'Accept-Language': 'zh-CN,en-US;q=0.8',
+        'X-Requested-With': 'com.wm.dmall',
+        'Cookie': cookies
     }
-    params = {
-        'callback': 'jQuery223022011260293271162_1625045888680'
-    }
+
+    data = {}
     try:
-        response = requests.get(
-            'https://appapis.dmall.com/static/queryInviteAct.jsonp',
-            headers=headers, params=params, cookies=cookies,
-            verify=False)
-    except:
-        print("网络请求异常,get_own_sharecode")
+        response = requests.post('https://sign-in.dmall.com/queryInviteAct', headers=headers, data=data,
+                                 verify=False)
+    except Exception as e:
+        print(e)
         return
-    nPos = response.text.index('(') + 1
-    response = response.text[nPos:-1].replace("'", '"')
+    response = response.text.lstrip('(').rstrip(')').replace("'", '"')
     data = json.loads(response)
-    key_count = data.get("result").get('data').get('inviteBox').get('keyCount')
-    invite_result_arr = data.get("result").get('data').get('inviteBox').get('boxes')
-    for index in range(key_count):
+    print(data)
+
+
+    # nPos = response.text.index('(') + 1
+    # response = response.text[nPos:-1].replace("'", '"')
+    # data = json.loads(response)
+    # # key_count = data.get("data").get('inviteBox').get('keyCount')
+    # key_count = 3
+    invite_result_arr = data.get('data').get('inviteBox').get('boxes')
+    for item in invite_result_arr:
         # 获取奖励
-        get_assistant_reward(cookies, index)
+        get_assistant_reward(cookies, item.get('index'))
 
 
 def get_assistant_reward(cookies, index):
@@ -385,33 +389,31 @@ def get_assistant_reward(cookies, index):
     获取助力奖励
     """
     headers = {
-        'Host': 'appapis.dmall.com',
+        'Host': 'sign-in.dmall.com',
         'Connection': 'keep-alive',
         'Pragma': 'no-cache',
         'Cache-Control': 'no-cache',
         'User-Agent': UserAgent,
-        'Accept': '*/*',
-        'Referer': 'https://i.dmall.com/kayak-project/mpactivities/html/invite/invite2.html?inviteCode=tv4bfAAh&tdc=26.21.0.36081-37852-52340024-52315293.259200000&cookie=%7B%22token%22%3A%22c8587e40-2913-4951-9e28-1c001e691a4e%22%2C%22ticketName%22%3A%224040F4DEB3424DD69B5F9C3FDE387A2CA2707868DCCA510CEFBEC74756823E169AB54715A91C1EA35CAEFF9E2A35BE7CAA109C172735900F282859301CA4F0B0EDEEF4D1ACA8A8662B41374F58A4B57A3DD48F334A048024AE8E429B3D0378794B7B943ABE28765D693C09FA3C7310DCF3B2EEC5A3249E321DB14C42617DEEB7%22%2C%22ticketLoginId%22%3A%22d96ce6fe-5ed5-48ed-a9de-f9f21d4baa2d%22%2C%22utmSourceId%22%3A%22%22%2C%22userId%22%3A29071278%2C%22platform%22%3A%22miniprogram%22%2C%22uuid%22%3A%22C96632F343D000026F701C0016F0CEE01623405465662%22%2C%22GPSLatLng%22%3A%22undefined%2Cundefined%22%2C%22pos_get_time%22%3Anull%2C%22openId%22%3A%22oO2Dq0JQ_iCXLx4ZEpU9UqUTK9HA%22%2C%22st%22%3A1623405465959%2C%22sc%22%3A1%2C%22et%22%3A1625043779213%2C%22project%22%3A%22%E4%B8%BB%E5%B0%8F%E7%A8%8B%E5%BA%8F%22%2C%22wxaCurStores%22%3A%22%22%2C%22addHitStore%22%3A%22%22%2C%22address%22%3A%22%22%2C%22latlng%22%3A%22%22%2C%22areaName%22%3A%22undefined%22%2C%22trackProject%22%3A%22%E4%B8%BB%E5%B0%8F%E7%A8%8B%E5%BA%8F%22%2C%22storeGroup%22%3A%22%22%2C%22theme%22%3A%7B%22mainColor%22%3A%22rgba(255%2C104%2C10%2C1)%22%2C%22secondColor%22%3A%22rgba(255%2C104%2C10%2C1)%22%2C%22iconColor%22%3A%22rgba(255%2C104%2C10%2C1)%22%2C%22graColor%22%3A%22rgba(255%2C138%2C0%2C1)%22%7D%2C%22wxAddrId%22%3A%22%22%2C%22dmTenantId%22%3A%221%22%2C%22source%22%3A%229%22%7D&t=1625043779945',
+        'Accept': 'application/json, text/plain, */*',
+        'Origin': 'https://appsign-in.dmall.com',
+        'Referer': 'https://appsign-in.dmall.com/?dmNeedLogin=true&dmfrom=wx&dmTransStatusBar=true&dmShowTitleBar=false&bounces=false&dmTransStatusBar=true&dmShowTitleBar=false&bounces=false&dmNeedLogin=true',
         'Accept-Encoding': 'gzip, deflate',
-        'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
-        'X-Requested-With': 'com.tencent.mm',
-        'Sec-Fetch-Site': 'same-site',
-        'Sec-Fetch-Mode': 'no-cors'
+        'Accept-Language': 'zh-CN,en-US;q=0.8',
+        'X-Requested-With': 'com.wm.dmall',
+        'Cookie': cookies
     }
-    params = {
-        'callback': 'jQuery223022011260293271162_1625045888680',
+
+    data = {
         'index': index
     }
     try:
-        response = requests.get(
-            'https://appapis.dmall.com//static/openBox.jsonp',
-            headers=headers, params=params, cookies=cookies,
-            verify=False)
-    except:
-        print("网络请求异常,get_own_sharecode")
+        response = requests.post('https://sign-in.dmall.com/openBox', headers=headers, data=data,
+                                 verify=False)
+    except Exception as e:
+        print(e)
         return
-    nPos = response.text.index('(') + 1
-    response = response.text[nPos:-1].replace("'", '"')
+    print(response)
+    response = response.text.lstrip('(').rstrip(')').replace("'", '"')
     data = json.loads(response)
     print(data)
 
@@ -425,33 +427,31 @@ def run():
         print(f">>>>>>>【账号开始{k+1}】\n")
         cookies = str2dict(v)
 
-        get_invite_code(cookies)
-        do_signin(cookies)
-        get_signin_info(cookies)
+        # get_invite_code(v)
+        do_signin(v)
+        get_signin_info(v)
 
         # 助力
-        token = cookies.get("token")
-        ticket_name = cookies.get("token")
-        for v in assistCode.rstrip('&').split('&'):
+        for t in assistCode.rstrip('&').split('&'):
             time.sleep(2)
-            do_assistant(cookies, v, ticket_name, token)
+            do_assistant(v, t)
 
         # 获取连续签到7天和11天奖励
         # get_account_signin_reward(cookies)
 
-        summary_table[f"账号{k+1}"] = {
-            '本月已连续签到': currentMonthContinuousDays,
-            '本月已累计签到': currentMonthAddUpDays,
-            '今日签到': hasCheckIn,
-            '当前多点金币': score
-        }
+        # summary_table[f"账号{k+1}"] = {
+        #     '本月已连续签到': currentMonthContinuousDays,
+        #     '本月已累计签到': currentMonthAddUpDays,
+        #     '今日签到': hasCheckIn,
+        #     '当前多点金币': score
+        # }
 
     for k, v in enumerate(cookiesList):
         print(f">>>>>>>【账号开始{k+1}】\n")
         cookies = str2dict(v)
-        get_assistant_status(cookies)
+        get_assistant_status(v)
 
-    summary_info()
+    # summary_info()
 
 
 if __name__ == "__main__":
